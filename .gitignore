@@ -1,0 +1,9 @@
+# from template
+tempCodeRunnerFile.*
+*.log
+/bin/
+/.settings/
+/.metadata/
+/.DS_Store
+/.classpath
+# end template

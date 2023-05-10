@@ -1,0 +1,34 @@
+
+!define Table(name,desc) class name as "desc" << (T,#FFAAAA) >>
+!define primary_key(x) <b><color:red>x</color></b>
+!define foreign_key(x) <color:blue>x</color>
+hide methods
+hide stereotypes
+
+Table(ユーザーテーブル, "ユーザーテーブル") {
+    primary_key(ID)
+    名前
+}
+
+Table(商品テーブル, "商品テーブル") {
+    primary_key(商品ID)
+    商品名
+    値段
+    foreign_key(カテゴリーID)
+}
+
+Table(カテゴリーテーブル, "カテゴリーテーブル") {
+    primary_key(カテゴリーID)
+    カテゴリー名
+}
+
+Table(購入履歴テーブル, "購入履歴テーブル") {
+    primary_key(購入ID)
+    foreign_key(ユーザーID)
+    foreign_key(商品ID)
+    購入日
+}
+
+ユーザーテーブル -- 購入履歴テーブル : "1--N"
+商品テーブル -- 購入履歴テーブル : "1--N"
+カテゴリーテーブル -- 商品テーブル : "1--N"

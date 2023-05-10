@@ -1,0 +1,2867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  
+</body>
+GPG(1)　　　　　　　　　　　　　　　  GNU Privacy Guard 2.2　　　　　　　　　　　　　　　  GPG(1)<br>
+<br>
+NAME<br>　　　gpg - OpenPGP encryption and signing tool<br>
+<br>
+SYNOPSIS<br>
+　　　gpg [--homedir dir] [--options file] [options] command [args]<br>
+<br>
+DESCRIPTION<br>
+　　　gpg is the OpenPGP part of the GNU Privacy Guard (GnuPG). It is a tool to provide digital encryption<br>
+　　　and signing services using the OpenPGP standard. gpg features complete key management  and  all  the<br>
+　　　bells and whistles you would expect from a full OpenPGP implementation.<br>
+<br>
+　　　There are two main versions of GnuPG: GnuPG 1.x and GnuPG 2.x.  GnuPG 2.x supports modern encryption<br>
+　　　algorithms and thus should be preferred over GnuPG 1.x.  You only need to  use  GnuPG  1.x  if  your<br>
+　　　platform  doesn't support GnuPG 2.x, or you need support for some features that GnuPG 2.x has depre‐<br>
+　　　cated, e.g., decrypting data created with PGP-2 keys.<br>
+<br>
+　　　If you are looking for version 1 of GnuPG, you may find that version installed under the name gpg1.<br>
+<br>
+RETURN VALUE<br>
+　　　The program returns 0 if there are no severe errors, 1 if at least a signature was  bad,  and  other<br>
+　　　error codes for fatal errors.<br>
+<br>
+　　　Note that signature verification requires exact knowledge of what has been signed and by whom it has<br>
+　　　beensigned.  Using only the return code is thus not an appropriate way to verify a  signature  by  a<br>
+　　　script.   Either make proper use or the status codes or use the gpgv tool which has been designed to<br>
+　　　make signature verification easy for scripts.<br>
+<br>
+WARNINGS<br>
+　　　Use a good password for your user account and make sure that all security issues are always fixed on<br>
+　　　your  machine.   Also  employ  diligent physical protection to your machine.  Consider to use a good<br>
+　　　passphrase as a last resort protection to your secret key in the case your machine gets stolen.   It<br>
+　　　is important that your secret key is never leaked.  Using an easy to carry around token or smartcard<br>
+　　　with the secret key is often a advisable.<br>
+<br>
+　　　If you are going to verify detached signatures, make sure that the program knows  about  it;  either<br>
+　　　give both filenames on the command line or use ‘-’ to specify STDIN.<br>
+<br>
+　　　For scripted or other unattended use of gpg make sure to use the machine-parseable interface and not<br>
+　　　the default interface which is intended for direct use by humans.  The  machine-parseable  interface<br>
+　　　provides  a  stable  and well documented API independent of the locale or future changes of gpg.  To<br>
+　　　enable this interface use the options --with-colons and --status-fd.  For certain operations the op‐<br>
+　　　tion  --command-fd  may come handy too.  See this man page and the file ‘DETAILS’ for the specifica‐<br>
+　　　tion of the interface.  Note that the GnuPG ``info'' pages as well as the PDF version of  the  GnuPG<br>
+　　　manual  features  a  chapter on unattended use of GnuPG.  As an alternative the library GPGME can be<br>
+　　　used as a high-level abstraction on top of that interface.<br>
+<br>
+INTEROPERABILITY<br>
+　　　GnuPG tries to be a very flexible implementation of the OpenPGP standard. In particular,  GnuPG  im‐<br>
+　　　plements  many  of  the  optional  parts of the standard, such as the SHA-512 hash, and the ZLIB and<br>
+　　　BZIP2 compression algorithms. It is important to be aware that not all  OpenPGP  programs  implement<br>
+　　　these  optional  algorithms  and  that  by  forcing  their use via the --cipher-algo, --digest-algo,<br>
+　　　--cert-digest-algo, or --compress-algo options in GnuPG, it is possible to create a perfectly  valid<br>
+　　　OpenPGP message, but one that cannot be read by the intended recipient.<br>
+<br>
+　　　There are dozens of variations of OpenPGP programs available, and each supports a slightly different<br>
+　　　subset of these optional algorithms.  For example, until recently, no (unhacked) version of PGP sup‐<br>
+　　　ported  the  BLOWFISH  cipher  algorithm. A message using BLOWFISH simply could not be read by a PGP<br>
+　　　user. By default, GnuPG uses the standard OpenPGP preferences system that will always do  the  right<br>
+　　　thing  and  create  messages  that are usable by all recipients, regardless of which OpenPGP program<br>
+　　　they use. Only override this safe default if you really know what you are doing.<br>
+<br>
+　　　If you absolutely must override the safe default, or if the preferences on a given key  are  invalid<br>
+　　　for  some  reason, you are far better off using the --pgp6, --pgp7, or --pgp8 options. These options<br>
+　　　are safe as they do not force any particular algorithms in violation of OpenPGP, but  rather  reduce<br>
+　　　the available algorithms to a "PGP-safe" list.<br>
+<br>
+COMMANDS<br>
+　　　Commands  are  not  distinguished from options except for the fact that only one command is allowed.<br>
+　　　Generally speaking, irrelevant options are silently ignored, and may not be checked for correctness.<br>
+<br>
+　　　gpg may be run with no commands. In this case it will print a warning perform  a  reasonable  action<br>
+　　　depending  on  the type of file it is given as input (an encrypted message is decrypted, a signature<br>
+　　　is verified, a file containing keys is listed, etc.).<br>
+<br>
+　　　If you run into any problems, please add the option --verbose to the invocation to see more diagnos‐<br>
+　　　tics.<br>
+<br>
+   Commands not specific to the function<br>
+<br>
+　　　--version<br>
+　　　　　　Print  the  program  version and licensing information.  Note that you cannot abbreviate this<br>
+　　　　　　command.<br>
+<br>
+　　　--help<br>
+　　　-h     Print a usage message summarizing the most useful command-line options.  Note that you cannot<br>
+　　　　　　arbitrarily abbreviate this command (though you can use its short form -h).<br>
+<br>
+　　　--warranty<br>
+　　　　　　Print warranty information.<br>
+<br>
+　　　--dump-options<br>
+　　　　　　Print  a  list  of  all available options and commands.  Note that you cannot abbreviate this<br>
+　　　　　　command.<br>
+<br>
+   Commands to select the type of operation<br>
+<br>
+　　　--sign<br>
+　　　-s     Sign a message. This command may be combined with --encrypt (to sign and encrypt a  message),<br>
+　　　　　　--symmetric  (to sign and symmetrically encrypt a message), or both --encrypt and --symmetric<br>
+　　　　　　(to sign and encrypt a message that can be decrypted using a secret  key  or  a  passphrase).<br>
+　　　　　　The  signing  key  is  chosen  by default or can be set explicitly using the --local-user and<br>
+　　　　　　--default-key options.<br>
+<br>
+　　　--clear-sign<br>
+　　　--clearsign<br>
+　　　　　　Make a cleartext signature.  The content in a cleartext signature  is  readable  without  any<br>
+　　　　　　special  software. OpenPGP software is only needed to verify the signature.  cleartext signa‐<br>
+　　　　　　tures may modify end-of-line whitespace for platform independence and are not intended to  be<br>
+　　　　　　reversible.  The signing key is chosen by default or can be set explicitly using the --local-<br>
+　　　　　　user and --default-key options.<br>
+<br>
+　　　--detach-sign<br>
+　　　-b     Make a detached signature.<br>
+<br>
+　　　--encrypt<br>
+　　　-e     Encrypt data to one or more public keys. This command may be combined with  --sign  (to  sign<br>
+　　　　　　and  encrypt  a message), --symmetric (to encrypt a message that can be decrypted using a se‐<br>
+　　　　　　cret key or a passphrase), or --sign and --symmetric together (for a signed message that  can<br>
+　　　　　　be  decrypted  using  a secret key or a passphrase).  --recipient and related options specify<br>
+　　　　　　which public keys to use for encryption.<br>
+<br>
+　　　--symmetric<br>
+　　　-c     Encrypt with a symmetric cipher using a passphrase. The  default  symmetric  cipher  used  is<br>
+　　　　　　AES-128,  but  may be chosen with the --cipher-algo option. This command may be combined with<br>
+　　　　　　--sign (for a signed and symmetrically encrypted message), --encrypt (for a message that  may<br>
+　　　　　　be  decrypted  via  a  secret  key  or a passphrase), or --sign and --encrypt together (for a<br>
+　　　　　　signed message that may be decrypted via a secret key  or  a  passphrase).   gpg  caches  the<br>
+　　　　　　passphrase used for symmetric encryption so that a decrypt operation may not require that the<br>
+　　　　　　user needs to enter the passphrase.  The option --no-symkey-cache can be used to disable this<br>
+　　　　　　feature.<br>
+<br>
+　　　--store<br>
+　　　　　　Store only (make a simple literal data packet).<br>
+<br>
+　　　--decrypt<br>
+　　　-d     Decrypt the file given on the command line (or STDIN if no file is specified) and write it to<br>
+　　　　　　STDOUT (or the file specified with --output). If the decrypted file is signed, the  signature<br>
+　　　　　　is  also verified. This command differs from the default operation, as it never writes to the<br>
+　　　　　　filename which is included in the file and it rejects files that  don't  begin  with  an  en‐<br>
+　　　　　　crypted message.<br>
+<br>
+　　　--verify<br>
+　　　　　　Assume  that the first argument is a signed file and verify it without generating any output.<br>
+　　　　　　With no arguments, the signature packet is read from STDIN.  If only one argument  is  given,<br>
+　　　　　　the specified file is expected to include a complete signature.<br>
+<br>
+　　　　　　With  more than one argument, the first argument should specify a file with a detached signa‐<br>
+　　　　　　ture and the remaining files should contain the signed data. To read  the  signed  data  from<br>
+　　　　　　STDIN,  use  ‘-’ as the second filename.  For security reasons, a detached signature will not<br>
+　　　　　　read the signed material from STDIN if not explicitly specified.<br>
+<br>
+　　　　　　Note: If the option --batch is not used, gpg may assume that a single argument is a file with<br>
+　　　　　　a  detached signature, and it will try to find a matching data file by stripping certain suf‐<br>
+　　　　　　fixes.  Using this historical feature to verify a detached signature is strongly discouraged;<br>
+　　　　　　you should always specify the data file explicitly.<br>
+<br>
+　　　　　　Note:  When  verifying  a  cleartext signature, gpg verifies only what makes up the cleartext<br>
+　　　　　　signed data and not any extra data outside of the cleartext signature or the header lines di‐<br>
+　　　　　　rectly  following the dash marker line.  The option --output may be used to write out the ac‐<br>
+　　　　　　tual signed data, but there are other pitfalls with this format as well.  It is suggested  to<br>
+　　　　　　avoid cleartext signatures in favor of detached signatures.<br>
+<br>
+　　　　　　Note:  Sometimes the use of the gpgv tool is easier than using the full-fledged gpg with this<br>
+　　　　　　option.  gpgv is designed to compare signed data against a list of trusted keys  and  returns<br>
+　　　　　　with success only for a good signature.  It has its own manual page.<br>
+<br>
+　　　--multifile<br>
+　　　　　　This  modifies  certain other commands to accept multiple files for processing on the command<br>
+　　　　　　line or read from STDIN with each filename on a separate line. This allows for many files  to<br>
+　　　　　　be  processed  at once. --multifile may currently be used along with --verify, --encrypt, and<br>
+　　　　　　--decrypt. Note that --multifile --verify may not be used with detached signatures.<br>
+<br>
+　　　--verify-files<br>
+　　　　　　Identical to --multifile --verify.<br>
+<br>
+　　　--encrypt-files<br>
+　　　　　　Identical to --multifile --encrypt.<br>
+<br>
+　　　--decrypt-files<br>
+　　　　　　Identical to --multifile --decrypt.<br>
+<br>
+　　　--list-keys<br>
+　　　-k<br>
+　　　--list-public-keys<br>
+　　　　　　List the specified keys.  If no keys are specified, then all keys from the configured  public<br>
+　　　　　　keyrings are listed.<br>
+<br>
+　　　　　　Never  use  the  output of this command in scripts or other programs.  The output is intended<br>
+　　　　　　only for humans and its format is likely to change.  The --with-colons option emits the  out‐<br>
+　　　　　　put  in  a  stable,  machine-parseable format, which is intended for use by scripts and other<br>
+　　　　　　programs.<br>
+<br>
+　　　--list-secret-keys<br>
+　　　-K     List the specified secret keys.  If no keys are specified, then all  known  secret  keys  are<br>
+　　　　　　listed.   A  #  after the initial tags sec or ssb means that the secret key or subkey is cur‐<br>
+　　　　　　rently not usable.  We also say that this key has been taken offline (for example, a  primary<br>
+　　　　　　key  can be taken offline by exporting the key using the command --export-secret-subkeys).  A<br>
+　　　　　　> after these tags indicate that the key is stored on a smartcard.  See also --list-keys.<br>
+<br>
+　　　--check-signatures<br>
+　　　--check-sigs<br>
+　　　　　　Same as --list-keys, but the key signatures are verified and listed too.  Note that for  per‐<br>
+　　　　　　formance  reasons  the revocation status of a signing key is not shown.  This command has the<br>
+　　　　　　same effect as using --list-keys with --with-sig-check.<br>
+<br>
+　　　　　　The status of the verification is indicated by a flag directly following the "sig"  tag  (and<br>
+　　　　　　thus  before the flags described below.  A "!" indicates that the signature has been success‐<br>
+　　　　　　fully verified, a "-" denotes a bad signature and a "%" is used if an  error  occurred  while<br>
+　　　　　　checking  the signature (e.g. a non supported algorithm).  Signatures where the public key is<br>
+　　　　　　not available are not listed; to see their keyids the command --list-sigs can be used.<br>
+<br>
+　　　　　　For each signature listed, there are several flags in between the signature status  flag  and<br>
+　　　　　　keyid.   These  flags  give  additional  information  about each key signature.  From left to<br>
+　　　　　　right, they are the numbers 1-3 for certificate check level (see --ask-cert-level), "L" for a<br>
+　　　　　　local  or  non-exportable  signature (see --lsign-key), "R" for a nonRevocable signature (see<br>
+　　　　　　the --edit-key command "nrsign"), "P" for a signature that contains a policy URL (see --cert-<br>
+　　　　　　policy-url),  "N"  for a signature that contains a notation (see --cert-notation), "X" for an<br>
+　　　　　　eXpired signature (see --ask-cert-expire), and the numbers 1-9 or "T" for 10 and above to in‐<br>
+　　　　　　dicate trust signature levels (see the --edit-key command "tsign").<br>
+<br>
+　　　--locate-keys<br>
+　　　--locate-external-keys<br>
+　　　　　　Locate  the  keys given as arguments.  This command basically uses the same algorithm as used<br>
+　　　　　　when locating keys for encryption or signing and may thus be used to see what keys gpg  might<br>
+　　　　　　use.   In particular external methods as defined by --auto-key-locate may be used to locate a<br>
+　　　　　　key.  Only public keys are listed.  The variant --locate-external-keys does  not  consider  a<br>
+　　　　　　locally  existing  key and can thus be used to force the refresh of a key via the defined ex‐<br>
+　　　　　　ternal methods.<br>
+<br>
+　　　--show-keys<br>
+　　　　　　This commands takes OpenPGP keys as input and prints information about them in the  same  way<br>
+　　　　　　the command --list-keys does for locally stored key.  In addition the list options show-unus‐<br>
+　　　　　　able-uids, show-unusable-subkeys, show-notations and show-policy-urls are also  enabled.   As<br>
+　　　　　　usual  for  automated  processing,  this  command  should be combined with the option --with-<br>
+　　　　　　colons.<br>
+<br>
+　　　--fingerprint<br>
+　　　　　　List all keys (or the specified ones) along with their fingerprints. This is the same  output<br>
+　　　　　　as  --list-keys  but  with  the additional output of a line with the fingerprint. May also be<br>
+　　　　　　combined with --check-signatures.  If this command is given twice, the  fingerprints  of  all<br>
+　　　　　　secondary  keys  are listed too.  This command also forces pretty printing of fingerprints if<br>
+　　　　　　the keyid format has been set to "none".<br>
+<br>
+　　　--list-packets<br>
+　　　　　　List only the sequence of packets.  This command is only useful  for  debugging.   When  used<br>
+　　　　　　with option --verbose the actual MPI values are dumped and not only their lengths.  Note that<br>
+　　　　　　the output of this command may change with new releases.<br>
+<br>
+　　　--edit-card<br>
+　　　--card-edit<br>
+　　　　　　Present a menu to work with a smartcard. The subcommand "help" provides an overview on avail‐<br>
+　　　　　　able   commands.   For   a   detailed   description,   please   see   the   Card   HOWTO   at<br>
+　　　　　　https://gnupg.org/documentation/howtos.html#GnuPG-cardHOWTO .<br>
+<br>
+　　　--card-status<br>
+　　　　　　Show the content of the smart card.<br>
+<br>
+　　　--change-pin<br>
+　　　　　　Present a menu to allow changing the PIN of a smartcard. This functionality is also available<br>
+　　　　　　as the subcommand "passwd" with the --edit-card command.<br>
+<br>
+　　　--delete-keys name<br>
+　　　　　　Remove key from the public keyring. In batch mode either --yes is required or the key must be<br>
+　　　　　　specified by fingerprint. This is a safeguard against accidental deletion of  multiple  keys.<br>
+　　　　　　If  the  exclamation mark syntax is used with the fingerprint of a subkey only that subkey is<br>
+　　　　　　deleted; if the exclamation mark is used with the fingerprint of the primary key  the  entire<br>
+　　　　　　public key is deleted.<br>
+<br>
+　　　--delete-secret-keys name<br>
+　　　　　　Remove  key  from the secret keyring. In batch mode the key must be specified by fingerprint.<br>
+　　　　　　The option --yes can be used to advise gpg-agent not to request a confirmation.   This  extra<br>
+　　　　　　pre-caution  is  done  because  gpg  can't be sure that the secret key (as controlled by gpg-<br>
+　　　　　　agent) is only used for the given OpenPGP public key.  If the exclamation mark syntax is used<br>
+　　　　　　with  the  fingerprint of a subkey only the secret part of that subkey is deleted; if the ex‐<br>
+　　　　　　clamation mark is used with the fingerprint of the primary key only the secret  part  of  the<br>
+　　　　　　primary key is deleted.<br>
+<br>
+　　　--delete-secret-and-public-key name<br>
+　　　　　　Same as --delete-key, but if a secret key exists, it will be removed first. In batch mode the<br>
+　　　　　　key must be specified by fingerprint.  The option --yes can be used to advise  gpg-agent  not<br>
+　　　　　　to request a confirmation.<br>
+<br>
+　　　--export<br>
+　　　　　　Either  export  all  keys from all keyrings (default keyrings and those registered via option<br>
+　　　　　　--keyring), or if at least one name is given, those of the given name. The exported keys  are<br>
+　　　　　　written  to  STDOUT  or to the file given with option --output.  Use together with --armor to<br>
+　　　　　　mail those keys.<br>
+<br>
+　　　--send-keys keyIDs<br>
+　　　　　　Similar to --export but sends the keys to a keyserver.  Fingerprints may be used  instead  of<br>
+　　　　　　key  IDs.   Don't  send your complete keyring to a keyserver --- select only those keys which<br>
+　　　　　　are new or changed by you.  If no keyIDs are given, gpg does nothing.<br>
+<br>
+　　　　　　Take care: Keyservers are by design write only systems and thus it is not  possible  to  ever<br>
+　　　　　　delete keys once they have been send to a keyserver.<br>
+<br>
+　　　--export-secret-keys<br>
+　　　--export-secret-subkeys<br>
+　　　　　　Same as --export, but exports the secret keys instead.  The exported keys are written to STD‐<br>
+　　　　　　OUT or to the file given with option --output.  This command is often used along with the op‐<br>
+　　　　　　tion  --armor  to  allow  for easy printing of the key for paper backup; however the external<br>
+　　　　　　tool paperkey does a better job of creating backups on paper.  Note that exporting  a  secret<br>
+　　　　　　key can be a security risk if the exported keys are sent over an insecure channel.<br>
+<br>
+　　　　　　The second form of the command has the special property to render the secret part of the pri‐<br>
+　　　　　　mary key useless; this is a GNU extension to OpenPGP and other implementations can not be ex‐<br>
+　　　　　　pected  to successfully import such a key.  Its intended use is in generating a full key with<br>
+　　　　　　an additional signing subkey on a dedicated machine.  This command then exports the key with‐<br>
+　　　　　　out the primary key to the main machine.<br>
+<br>
+　　　　　　GnuPG  may ask you to enter the passphrase for the key.  This is required, because the inter‐<br>
+　　　　　　nal protection method of the secret key is different from the one specified  by  the  OpenPGP<br>
+　　　　　　protocol.<br>
+<br>
+　　　--export-ssh-key<br>
+　　　　　　This command is used to export a key in the OpenSSH public key format.  It requires the spec‐<br>
+　　　　　　ification of one key by the usual means and exports the latest valid subkey which has an  au‐<br>
+　　　　　　thentication capability to STDOUT or to the file given with option --output.  That output can<br>
+　　　　　　directly be added to ssh's ‘authorized_key’ file.<br>
+<br>
+　　　　　　By specifying the key to export using a key ID or a fingerprint suffixed with an  exclamation<br>
+　　　　　　mark  (!),  a specific subkey or the primary key can be exported.  This does not even require<br>
+　　　　　　that the key has the authentication capability flag set.<br>
+<br>
+　　　--import<br>
+　　　--fast-import<br>
+　　　　　　Import/merge keys. This adds the given keys to the keyring. The  fast  version  is  currently<br>
+　　　　　　just a synonym.<br>
+<br>
+　　　　　　There are a few other options which control how this command works.  Most notable here is the<br>
+　　　　　　--import-options merge-only option which does not insert new keys but does only  the  merging<br>
+　　　　　　of new signatures, user-IDs and subkeys.<br>
+<br>
+　　　--receive-keys keyIDs<br>
+　　　--recv-keys keyIDs<br>
+　　　　　　Import the keys with the given keyIDs from a keyserver.<br>
+<br>
+　　　--refresh-keys<br>
+　　　　　　Request  updates  from  a keyserver for keys that already exist on the local keyring. This is<br>
+　　　　　　useful for updating a key with the latest signatures, user IDs, etc. Calling this with no ar‐<br>
+　　　　　　guments will refresh the entire keyring.<br>
+<br>
+　　　--search-keys names<br>
+　　　　　　Search  the  keyserver for the given names. Multiple names given here will be joined together<br>
+　　　　　　to create the search string for the keyserver.  Note that keyservers search for  names  in  a<br>
+　　　　　　different  and  simpler way than gpg does.  The best choice is to use a mail address.  Due to<br>
+　　　　　　data privacy reasons keyservers may even not even allow searching by user id or mail  address<br>
+　　　　　　and thus may only return results when being used with the --recv-key command to search by key<br>
+　　　　　　fingerprint or keyid.<br>
+<br>
+　　　--fetch-keys URIs<br>
+　　　　　　Retrieve keys located at the specified URIs. Note that different installations of  GnuPG  may<br>
+　　　　　　support  different  protocols  (HTTP, FTP, LDAP, etc.).  When using HTTPS the system provided<br>
+　　　　　　root certificates are used by this command.<br>
+<br>
+　　　--update-trustdb<br>
+　　　　　　Do trust database maintenance. This command iterates over all keys  and  builds  the  Web  of<br>
+　　　　　　Trust.  This is an interactive command because it may have to ask for the "ownertrust" values<br>
+　　　　　　for keys. The user has to give an estimation of how far she trusts the owner of the displayed<br>
+　　　　　　key  to  correctly  certify (sign) other keys. GnuPG only asks for the ownertrust value if it<br>
+　　　　　　has not yet been assigned to a key. Using the --edit-key menu,  the  assigned  value  can  be<br>
+　　　　　　changed at any time.<br>
+<br>
+　　　--check-trustdb<br>
+　　　　　　Do  trust database maintenance without user interaction. From time to time the trust database<br>
+　　　　　　must be updated so that expired keys or signatures and the resulting changes in  the  Web  of<br>
+　　　　　　Trust can be tracked. Normally, GnuPG will calculate when this is required and do it automat‐<br>
+　　　　　　ically unless --no-auto-check-trustdb is set. This command can be used to force a trust data‐<br>
+　　　　　　base  check at any time. The processing is identical to that of --update-trustdb but it skips<br>
+　　　　　　keys with a not yet defined "ownertrust".<br>
+<br>
+　　　　　　For use with cron jobs, this command can be used together with  --batch  in  which  case  the<br>
+　　　　　　trust database check is done only if a check is needed. To force a run even in batch mode add<br>
+　　　　　　the option --yes.<br>
+<br>
+　　　--export-ownertrust<br>
+　　　　　　Send the ownertrust values to STDOUT. This is useful for backup purposes as these values  are<br>
+　　　　　　the only ones which can't be re-created from a corrupted trustdb.  Example:<br>
+　　　　　　    gpg --export-ownertrust > otrust.txt<br>
+<br>
+　　　--import-ownertrust<br>
+　　　　　　Update the trustdb with the ownertrust values stored in files (or STDIN if not given); exist‐<br>
+　　　　　　ing values will be overwritten.  In case of a severely damaged trustdb and if you have a  re‐<br>
+　　　　　　cent  backup  of the ownertrust values (e.g. in the file ‘otrust.txt’), you may re-create the<br>
+　　　　　　trustdb using these commands:<br>
+　　　　　　    cd ~/.gnupg<br>
+　　　　　　    rm trustdb.gpg<br>
+　　　　　　    gpg --import-ownertrust < otrust.txt<br>
+<br>
+　　　--rebuild-keydb-caches<br>
+　　　　　　When updating from version 1.0.6 to 1.0.7 this command should be  used  to  create  signature<br>
+　　　　　　caches in the keyring. It might be handy in other situations too.<br>
+<br>
+　　　--print-md algo<br>
+　　　--print-mds<br>
+　　　　　　Print  message  digest  of algorithm algo for all given files or STDIN.  With the second form<br>
+　　　　　　(or a deprecated "*" for algo) digests for all available algorithms are printed.<br>
+<br>
+　　　--gen-random 0|1|2 count<br>
+　　　　　　Emit count random bytes of the given quality level 0, 1 or 2. If count is not given or  zero,<br>
+　　　　　　an endless sequence of random bytes will be emitted.  If used with --armor the output will be<br>
+　　　　　　base64 encoded.  PLEASE, don't use this command unless you know what you are  doing;  it  may<br>
+　　　　　　remove precious entropy from the system!<br>
+<br>
+　　　--gen-prime mode bits<br>
+　　　　　　Use the source, Luke :-). The output format is subject to change with ant release.<br>
+<br>
+　　　--enarmor<br>
+　　　--dearmor<br>
+　　　　　　Pack  or  unpack an arbitrary input into/from an OpenPGP ASCII armor.  This is a GnuPG exten‐<br>
+　　　　　　sion to OpenPGP and in general not very useful.<br>
+<br>
+　　　--tofu-policy {auto|good|unknown|bad|ask} keys<br>
+　　　　　　Set the TOFU policy for all the bindings associated with the specified keys.  For more infor‐<br>
+　　　　　　mation about the meaning of the policies, see: [trust-model-tofu].  The keys may be specified<br>
+　　　　　　either by their fingerprint (preferred) or their keyid.<br>
+<br>
+   How to manage your keys<br>
+<br>
+　　　This section explains the main commands for key management.<br>
+<br>
+　　　--quick-generate-key user-id [algo [usage [expire]]]<br>
+　　　--quick-gen-key<br>
+　　　　　　This is a simple command to generate a standard key with one user id.  In contrast to  --gen‐<br>
+　　　　　　erate-key  the  key is generated directly without the need to answer a bunch of prompts.  Un‐<br>
+　　　　　　less the option --yes is given, the key creation will be canceled if the given  user  id  al‐<br>
+　　　　　　ready exists in the keyring.<br>
+<br>
+　　　　　　If  invoked  directly on the console without any special options an answer to a ``Continue?''<br>
+　　　　　　style confirmation prompt is required.  In case the user id already exists in the  keyring  a<br>
+　　　　　　second prompt to force the creation of the key will show up.<br>
+<br>
+　　　　　　If  algo  or  usage  are given, only the primary key is created and no prompts are shown.  To<br>
+　　　　　　specify an expiration date but still create a primary and subkey use ``default'' or ``future-<br>
+　　　　　　default''  for algo and ``default'' for usage.  For a description of these optional arguments<br>
+　　　　　　see the command --quick-add-key.  The usage accepts also the value ``cert'' which can be used<br>
+　　　　　　to  create  a  certification  only  primary key; the default is to a create certification and<br>
+　　　　　　signing key.<br>
+<br>
+　　　　　　The expire argument can be used to specify an expiration date for the key.   Several  formats<br>
+　　　　　　are  supported;  commonly the ISO formats ``YYYY-MM-DD'' or ``YYYYMMDDThhmmss'' are used.  To<br>
+　　　　　　make the key expire in N seconds, N days, N weeks, N months, or N  years  use  ``seconds=N'',<br>
+　　　　　　``Nd'',  ``Nw'',  ``Nm'', or ``Ny'' respectively.  Not specifying a value, or using ``-'' re‐<br>
+　　　　　　sults in a key expiring in a reasonable default interval.  The values ``never'', ``none'' can<br>
+　　　　　　be used for no expiration date.<br>
+<br>
+　　　　　　If  this  command  is used with --batch, --pinentry-mode has been set to loopback, and one of<br>
+　　　　　　the passphrase options (--passphrase, --passphrase-fd, or passphrase-file) is used, the  sup‐<br>
+　　　　　　plied  passphrase is used for the new key and the agent does not ask for it.  To create a key<br>
+　　　　　　without any protection --passphrase '' may be used.<br>
+<br>
+　　　　　　To create an OpenPGP key from the keys available on the  currently  inserted  smartcard,  the<br>
+　　　　　　special string ``card'' can be used for algo.  If the card features an encryption and a sign‐<br>
+　　　　　　ing key, gpg will figure them out and creates an OpenPGP key consisting of the usual  primary<br>
+　　　　　　key  and  one  subkey.   This  works only with certain smartcards.  Note that the interactive<br>
+　　　　　　--full-gen-key command allows to do the same but with greater flexibility in the selection of<br>
+　　　　　　the smartcard keys.<br>
+<br>
+　　　　　　Note that it is possible to create a primary key and a subkey using non-default algorithms by<br>
+　　　　　　using ``default'' and changing the default parameters  using  the  option  --default-new-key-<br>
+　　　　　　algo.<br>
+<br>
+　　　--quick-set-expire fpr expire [*|subfprs]<br>
+　　　　　　With  two  arguments given, directly set the expiration time of the primary key identified by<br>
+　　　　　　fpr to expire.  To remove the expiration time 0 can be used.  With three  arguments  and  the<br>
+　　　　　　third  given  as an asterisk, the expiration time of all non-revoked and not yet expired sub‐<br>
+　　　　　　keys are set to expire.  With more than two arguments and a list of  fingerprints  given  for<br>
+　　　　　　subfprs, all non-revoked subkeys matching these fingerprints are set to expire.<br>
+<br>
+　　　--quick-add-key fpr [algo [usage [expire]]]<br>
+　　　　　　Directly add a subkey to the key identified by the fingerprint fpr.  Without the optional ar‐<br>
+　　　　　　guments an encryption subkey is added.  If any of the arguments are  given  a  more  specific<br>
+　　　　　　subkey is added.<br>
+<br>
+　　　　　　algo may be any of the supported algorithms or curve names given in the format as used by key<br>
+　　　　　　listings.  To use the default algorithm the string ``default'' or ``-'' can  be  used.   Sup‐<br>
+　　　　　　ported  algorithms  are  ``rsa'',  ``dsa'',  ``elg'', ``ed25519'', ``cv25519'', and other ECC<br>
+　　　　　　curves.  For example the string ``rsa'' adds an RSA key with the default key length; a string<br>
+　　　　　　``rsa4096''  requests  that the key length is 4096 bits.  The string ``future-default'' is an<br>
+　　　　　　alias for the algorithm which will likely be used as default algorithm in future versions  of<br>
+　　　　　　gpg.   To list the supported ECC curves the command gpg --with-colons --list-config curve can<br>
+　　　　　　be used.<br>
+<br>
+　　　　　　Depending on the given algo the subkey may either be an encryption subkey or a  signing  sub‐<br>
+　　　　　　key.   If  an  algorithm is capable of signing and encryption and such a subkey is desired, a<br>
+　　　　　　usage string must be given.  This string is either ``default'' or ``-'' to keep  the  default<br>
+　　　　　　or  a comma delimited list (or space delimited list) of keywords: ``sign'' for a signing sub‐<br>
+　　　　　　key, ``auth'' for an authentication subkey, and ``encr''  for  an  encryption  subkey  (``en‐<br>
+　　　　　　crypt'' can be used as alias for ``encr'').  The valid combinations depend on the algorithm.<br>
+<br>
+　　　　　　The  expire  argument can be used to specify an expiration date for the key.  Several formats<br>
+　　　　　　are supported; commonly the ISO formats ``YYYY-MM-DD'' or ``YYYYMMDDThhmmss'' are  used.   To<br>
+　　　　　　make  the  key  expire in N seconds, N days, N weeks, N months, or N years use ``seconds=N'',<br>
+　　　　　　``Nd'', ``Nw'', ``Nm'', or ``Ny'' respectively.  Not specifying a value, or using  ``-''  re‐<br>
+　　　　　　sults in a key expiring in a reasonable default interval.  The values ``never'', ``none'' can<br>
+　　　　　　be used for no expiration date.<br>
+<br>
+　　　--generate-key<br>
+　　　--gen-key<br>
+　　　　　　Generate a new key pair using the current default parameters.  This is the  standard  command<br>
+　　　　　　to  create  a new key.  In addition to the key a revocation certificate is created and stored<br>
+　　　　　　in the ‘openpgp-revocs.d’ directory below the GnuPG home directory.<br>
+<br>
+　　　--full-generate-key<br>
+　　　--full-gen-key<br>
+　　　　　　Generate a new key pair with dialogs for all options.  This is an extended version of  --gen‐<br>
+　　　　　　erate-key.<br>
+<br>
+　　　　　　There is also a feature which allows you to create keys in batch mode. See the manual section<br>
+　　　　　　``Unattended key generation'' on how to use this.<br>
+<br>
+　　　--generate-revocation name<br>
+　　　--gen-revoke name<br>
+　　　　　　Generate a revocation certificate for the complete key.  To only revoke a  subkey  or  a  key<br>
+　　　　　　signature, use the --edit command.<br>
+<br>
+　　　　　　This  command  merely creates the revocation certificate so that it can be used to revoke the<br>
+　　　　　　key if that is ever needed.  To actually revoke a  key  the  created  revocation  certificate<br>
+　　　　　　needs to be merged with the key to revoke.  This is done by importing the revocation certifi‐<br>
+　　　　　　cate using the --import command.  Then the revoked key needs to be published, which  is  best<br>
+　　　　　　done by sending the key to a keyserver (command --send-key) and by exporting (--export) it to<br>
+　　　　　　a file which is then send to frequent communication partners.<br>
+<br>
+　　　--generate-designated-revocation name<br>
+　　　--desig-revoke name<br>
+　　　　　　Generate a designated revocation certificate for a key. This allows a user (with the  permis‐<br>
+　　　　　　sion of the keyholder) to revoke someone else's key.<br>
+<br>
+　　　--edit-key<br>
+　　　　　　Present  a menu which enables you to do most of the key management related tasks.  It expects<br>
+　　　　　　the specification of a key on the command line.<br>
+<br>
+　　　　　　uid n  Toggle selection of user ID or photographic user ID with index n.  Use * to select all<br>
+　　　　　　　　　and 0 to deselect all.<br>
+<br>
+　　　　　　key n  Toggle selection of subkey with index n or key ID n.  Use * to select all and 0 to de‐<br>
+　　　　　　　　　select all.<br>
+<br>
+　　　　　　sign   Make a signature on key of user name. If the key is not yet signed by the default user<br>
+　　　　　　　　　(or  the  users given with -u), the program displays the information of the key again,<br>
+　　　　　　　　　together with its fingerprint and asks whether it should be signed. This  question  is<br>
+　　　　　　　　　repeated for all users specified with -u.<br>
+<br>
+　　　　　　lsign  Same  as "sign" but the signature is marked as non-exportable and will therefore never<br>
+　　　　　　　　　be used by others. This may be used to make keys valid only in the local environment.<br>
+<br>
+　　　　　　nrsign Same as "sign" but the signature is marked as non-revocable and can therefore never be<br>
+　　　　　　　　　revoked.<br>
+<br>
+　　　　　　tsign  Make a trust signature. This is a signature that combines the notions of certification<br>
+　　　　　　　　　(like a regular signature), and trust (like the "trust" command). It is generally only<br>
+　　　　　　　　　useful  in  distinct communities or groups.  For more information please read the sec‐<br>
+　　　　　　　　　tions ``Trust Signature'' and ``Regular Expression'' in RFC-4880.<br>
+<br>
+　　　　　　Note that "l" (for local / non-exportable), "nr" (for non-revocable, and "t" (for trust)  may<br>
+　　　　　　be freely mixed and prefixed to "sign" to create a signature of any type desired.<br>
+<br>
+　　　If  the option --only-sign-text-ids is specified, then any non-text based user ids (e.g., photo IDs)<br>
+　　　will not be selected for signing.<br>
+<br>
+　　　　　　delsig Delete a signature. Note that it is not possible to retract a signature, once  it  has<br>
+　　　　　　　　　been send to the public (i.e. to a keyserver).  In that case you better use revsig.<br>
+<br>
+　　　　　　revsig Revoke  a signature. For every signature which has been generated by one of the secret<br>
+　　　　　　　　　keys, GnuPG asks whether a revocation certificate should be generated.<br>
+<br>
+　　　　　　check  Check the signatures on all selected user IDs.  With the  extra  option  selfsig  only<br>
+　　　　　　　　　self-signatures are shown.<br>
+<br>
+　　　　　　adduid Create an additional user ID.<br>
+<br>
+　　　　　　addphoto<br>
+　　　　　　　　　Create  a photographic user ID. This will prompt for a JPEG file that will be embedded<br>
+　　　　　　　　　into the user ID. Note that a very large JPEG will make for a  very  large  key.  Also<br>
+　　　　　　　　　note  that  some  programs will display your JPEG unchanged (GnuPG), and some programs<br>
+　　　　　　　　　will scale it to fit in a dialog box (PGP).<br>
+<br>
+　　　　　　showphoto<br>
+　　　　　　　　　Display the selected photographic user ID.<br>
+<br>
+　　　　　　deluid Delete a user ID or photographic user ID.  Note that it is not possible to  retract  a<br>
+　　　　　　　　　user  id, once it has been send to the public (i.e. to a keyserver).  In that case you<br>
+　　　　　　　　　better use revuid.<br>
+<br>
+　　　　　　revuid Revoke a user ID or photographic user ID.<br>
+<br>
+　　　　　　primary<br>
+　　　　　　　　　Flag the current user id as the primary one, removes the primary user id flag from all<br>
+　　　　　　　　　other  user  ids  and  sets  the  timestamp of all affected self-signatures one second<br>
+　　　　　　　　　ahead. Note that setting a photo user ID as primary makes it primary over other  photo<br>
+　　　　　　　　　user IDs, and setting a regular user ID as primary makes it primary over other regular<br>
+　　　　　　　　　user IDs.<br>
+<br>
+　　　　　　keyserver<br>
+　　　　　　　　　Set a preferred keyserver for the specified user ID(s). This  allows  other  users  to<br>
+　　　　　　　　　know where you prefer they get your key from. See --keyserver-options honor-keyserver-<br>
+　　　　　　　　　url for more on how this works.  Setting a value of "none" removes  an  existing  pre‐<br>
+　　　　　　　　　ferred keyserver.<br>
+<br>
+　　　　　　notation<br>
+　　　　　　　　　Set  a  name=value notation for the specified user ID(s). See --cert-notation for more<br>
+　　　　　　　　　on how this works. Setting a value of "none" removes all notations, setting a notation<br>
+　　　　　　　　　prefixed  with  a  minus  sign  (-) removes that notation, and setting a notation name<br>
+　　　　　　　　　(without the =value) prefixed with a minus sign removes all notations with that name.<br>
+<br>
+　　　　　　pref   List preferences from the selected user ID. This shows the actual preferences, without<br>
+　　　　　　　　　including any implied preferences.<br>
+<br>
+　　　　　　showpref<br>
+　　　　　　　　　More  verbose preferences listing for the selected user ID. This shows the preferences<br>
+　　　　　　　　　in effect by including the implied preferences of 3DES (cipher), SHA-1  (digest),  and<br>
+　　　　　　　　　Uncompressed (compression) if they are not already included in the preference list. In<br>
+　　　　　　　　　addition, the preferred keyserver and signature notations (if any) are shown.<br>
+<br>
+　　　　　　setpref string<br>
+　　　　　　　　　Set the list of user ID preferences to string for all (or just the selected) user IDs.<br>
+　　　　　　　　　Calling  setpref  with  no  arguments  sets the preference list to the default (either<br>
+　　　　　　　　　built-in or set via --default-preference-list), and calling setpref with "none" as the<br>
+　　　　　　　　　argument  sets  an empty preference list. Use gpg --version to get a list of available<br>
+　　　　　　　　　algorithms. Note that while you can change the preferences on  an  attribute  user  ID<br>
+　　　　　　　　　(aka  "photo  ID"), GnuPG does not select keys via attribute user IDs so these prefer‐<br>
+　　　　　　　　　ences will not be used by GnuPG.<br>
+<br>
+　　　　　　　　　When setting preferences, you should list the algorithms in the order which you'd like<br>
+　　　　　　　　　to  see them used by someone else when encrypting a message to your key.  If you don't<br>
+　　　　　　　　　include 3DES, it will be automatically added at the end.  Note  that  there  are  many<br>
+　　　　　　　　　factors  that go into choosing an algorithm (for example, your key may not be the only<br>
+　　　　　　　　　recipient), and so the remote OpenPGP application being used to send to you may or may<br>
+　　　　　　　　　not follow your exact chosen order for a given message.  It will, however, only choose<br>
+　　　　　　　　　an algorithm that is present on the preference list of every recipient key.  See  also<br>
+　　　　　　　　　the INTEROPERABILITY WITH OTHER OPENPGP PROGRAMS section below.<br>
+<br>
+　　　　　　addkey Add a subkey to this key.<br>
+<br>
+　　　　　　addcardkey<br>
+　　　　　　　　　Generate a subkey on a card and add it to this key.<br>
+<br>
+　　　　　　keytocard<br>
+　　　　　　　　　Transfer  the  selected  secret  subkey  (or the primary key if no subkey has been se‐<br>
+　　　　　　　　　lected) to a smartcard. The secret key in the keyring will be replaced by  a  stub  if<br>
+　　　　　　　　　the  key  could be stored successfully on the card and you use the save command later.<br>
+　　　　　　　　　Only certain key types may be transferred to the card. A sub menu allows you to select<br>
+　　　　　　　　　on  what card to store the key. Note that it is not possible to get that key back from<br>
+　　　　　　　　　the card - if the card gets broken your secret key will be  lost  unless  you  have  a<br>
+　　　　　　　　　backup somewhere.<br>
+<br>
+　　　　　　bkuptocard file<br>
+　　　　　　　　　Restore the given file to a card. This command may be used to restore a backup key (as<br>
+　　　　　　　　　generated during card initialization) to a new card. In almost all cases this will  be<br>
+　　　　　　　　　the encryption key. You should use this command only with the corresponding public key<br>
+　　　　　　　　　and make sure that the file given as argument is indeed the  backup  to  restore.  You<br>
+　　　　　　　　　should  then  select 2 to restore as encryption key.  You will first be asked to enter<br>
+　　　　　　　　　the passphrase of the backup key and then for the Admin PIN of the card.<br>
+<br>
+　　　　　　delkey Remove a subkey (secondary key). Note that it is not possible  to  retract  a  subkey,<br>
+　　　　　　　　　once  it  has  been send to the public (i.e. to a keyserver).  In that case you better<br>
+　　　　　　　　　use revkey.  Also note that this only deletes the public part of a key.<br>
+<br>
+　　　　　　revkey Revoke a subkey.<br>
+<br>
+　　　　　　expire Change the key or subkey expiration time. If a subkey is selected, the expiration time<br>
+　　　　　　　　　of  this  subkey will be changed. With no selection, the key expiration of the primary<br>
+　　　　　　　　　key is changed.<br>
+<br>
+　　　　　　trust  Change the owner trust value for the key. This updates the trust-db immediately and no<br>
+　　　　　　　　　save is required.<br>
+<br>
+　　　　　　disable<br>
+　　　　　　enable Disable  or  enable an entire key. A disabled key can not normally be used for encryp‐<br>
+　　　　　　　　　tion.<br>
+<br>
+　　　　　　addrevoker<br>
+　　　　　　　　　Add a designated revoker to the key. This takes one optional argument: "sensitive". If<br>
+　　　　　　　　　a  designated  revoker is marked as sensitive, it will not be exported by default (see<br>
+　　　　　　　　　export-options).<br>
+<br>
+　　　　　　passwd Change the passphrase of the secret key.<br>
+<br>
+　　　　　　toggle This is dummy command which exists only for backward compatibility.<br>
+<br>
+　　　　　　clean  Compact (by removing all signatures except the selfsig) any user ID that is no  longer<br>
+　　　　　　　　　usable  (e.g. revoked, or expired). Then, remove any signatures that are not usable by<br>
+　　　　　　　　　the trust calculations.  Specifically, this removes any signature that does not  vali‐<br>
+　　　　　　　　　date,  any  signature that is superseded by a later signature, revoked signatures, and<br>
+　　　　　　　　　signatures issued by keys that are not present on the keyring.<br>
+<br>
+　　　　　　minimize<br>
+　　　　　　　　　Make the key as small as possible. This removes all signatures from each user  ID  ex‐<br>
+　　　　　　　　　cept for the most recent self-signature.<br>
+<br>
+　　　　　　change-usage<br>
+　　　　　　　　　Change  the  usage flags (capabilities) of the primary key or of subkeys.  These usage<br>
+　　　　　　　　　flags (e.g. Certify, Sign, Authenticate, Encrypt) are set during key creation.   Some‐<br>
+　　　　　　　　　times  it is useful to have the opportunity to change them (for example to add Authen‐<br>
+　　　　　　　　　ticate) after they have been created.  Please take care when doing this;  the  allowed<br>
+　　　　　　　　　usage flags depend on the key algorithm.<br>
+<br>
+　　　　　　cross-certify<br>
+　　　　　　　　　Add  cross-certification  signatures  to  signing  subkeys that may not currently have<br>
+　　　　　　　　　them. Cross-certification signatures protect against a subtle attack  against  signing<br>
+　　　　　　　　　subkeys.  See  --require-cross-certification.  All new keys generated have this signa‐<br>
+　　　　　　　　　ture by default, so this command is only useful to bring older keys up to date.<br>
+<br>
+　　　　　　save   Save all changes to the keyrings and quit.<br>
+<br>
+　　　　　　quit   Quit the program without updating the keyrings.<br>
+<br>
+　　　　　　The listing shows you the key with its secondary keys and all user IDs.  The primary user  ID<br>
+　　　　　　is indicated by a dot, and selected keys or user IDs are indicated by an asterisk.  The trust<br>
+　　　　　　value is displayed with the primary key: "trust" is the assigned owner trust  and  "validity"<br>
+　　　　　　is  the calculated validity of the key.  Validity values are also displayed for all user IDs.<br>
+　　　　　　For possible values of trust, see: [trust-values].<br>
+<br>
+　　　--sign-key name<br>
+　　　　　　Signs a public key with your secret key. This is a shortcut version of the subcommand  "sign"<br>
+　　　　　　from --edit.<br>
+<br>
+　　　--lsign-key name<br>
+　　　　　　Signs  a  public  key with your secret key but marks it as non-exportable. This is a shortcut<br>
+　　　　　　version of the subcommand "lsign" from --edit-key.<br>
+<br>
+　　　--quick-sign-key fpr [names]<br>
+　　　--quick-lsign-key fpr [names]<br>
+　　　　　　Directly sign a key from the passphrase without any further user interaction.  The  fpr  must<br>
+　　　　　　be the verified primary fingerprint of a key in the local keyring. If no names are given, all<br>
+　　　　　　useful user ids are signed; with given [names] only useful user ids matching  one  of  theses<br>
+　　　　　　names  are  signed.  By default, or if a name is prefixed with a '*', a case insensitive sub‐<br>
+　　　　　　string match is used.  If a name is prefixed with a '=' a case sensitive exact match is done.<br>
+<br>
+　　　　　　The command --quick-lsign-key marks the signatures as  non-exportable.   If  such  a  non-ex‐<br>
+　　　　　　portable signature already exists the --quick-sign-key turns it into a exportable signature.<br>
+<br>
+　　　　　　This  command  uses reasonable defaults and thus does not provide the full flexibility of the<br>
+　　　　　　"sign" subcommand from --edit-key.  Its intended use is to help  unattended  key  signing  by<br>
+　　　　　　utilizing a list of verified fingerprints.<br>
+<br>
+　　　--quick-add-uid user-id new-user-id<br>
+　　　　　　This  command adds a new user id to an existing key.  In contrast to the interactive sub-com‐<br>
+　　　　　　mand adduid of --edit-key the new-user-id is added verbatim with only  leading  and  trailing<br>
+　　　　　　white  space  removed,  it is expected to be UTF-8 encoded, and no checks on its form are ap‐<br>
+　　　　　　plied.<br>
+<br>
+　　　--quick-revoke-uid user-id user-id-to-revoke<br>
+　　　　　　This command revokes a user ID on an existing key.  It cannot be used to revoke the last user<br>
+　　　　　　ID  on  key  (some  non-revoked  user ID must remain), with revocation reason ``User ID is no<br>
+　　　　　　longer valid''.  If you want to specify a different revocation reason, or to  supply  supple‐<br>
+　　　　　　mentary revocation text, you should use the interactive sub-command revuid of --edit-key.<br>
+<br>
+　　　--quick-revoke-sig fpr signing-fpr [names]<br>
+　　　　　　This  command  revokes  the  key signatures made by signing-fpr from the key specified by the<br>
+　　　　　　fingerprint fpr.  With names given only the signatures on user ids of the key matching any of<br>
+　　　　　　the given names are affected (see --quick-sign-key).  If a revocation already exists a notice<br>
+　　　　　　is printed instead of creating a new revocation; no error is returned  in  this  case.   Note<br>
+　　　　　　that  key  signature revocations may be superseded by a newer key signature and in turn again<br>
+　　　　　　revoked.<br>
+<br>
+　　　--quick-set-primary-uid user-id primary-user-id<br>
+　　　　　　This command sets or updates the primary user ID flag on an existing key.  user-id  specifies<br>
+　　　　　　the  key  and primary-user-id the user ID which shall be flagged as the primary user ID.  The<br>
+　　　　　　primary user ID flag is removed from all other user ids and the  timestamp  of  all  affected<br>
+　　　　　　self-signatures is set one second ahead.<br>
+<br>
+　　　--change-passphrase user-id<br>
+　　　--passwd user-id<br>
+　　　　　　Change  the  passphrase  of the secret key belonging to the certificate specified as user-id.<br>
+　　　　　　This is a shortcut for the sub-command passwd of the edit key menu.  When using together with<br>
+　　　　　　the  option --dry-run this will not actually change the passphrase but check that the current<br>
+　　　　　　passphrase is correct.<br>
+<br>
+OPTIONS<br>
+　　　gpg features a bunch of options to control the exact behaviour and to change the default  configura‐<br>
+　　　tion.<br>
+<br>
+　　　Long  options  can  be put in an options file (default "~/.gnupg/gpg.conf"). Short option names will<br>
+　　　not work - for example, "armor" is a valid option for the options file, while "a"  is  not.  Do  not<br>
+　　　write  the 2 dashes, but simply the name of the option and any required arguments. Lines with a hash<br>
+　　　('#') as the first non-white-space character are ignored. Commands may be put in this file too,  but<br>
+　　　that is not generally useful as the command will execute automatically with every execution of gpg.<br>
+<br>
+　　　Please remember that option parsing stops as soon as a non-option is encountered, you can explicitly<br>
+　　　stop parsing by using the special option --.<br>
+<br>
+   How to change the configuration<br>
+<br>
+　　　These options are used to change the configuration and are usually found in the option file.<br>
+<br>
+　　　--default-key name<br>
+　　　　　　Use name as the default key to sign with. If this option is not used, the default key is  the<br>
+　　　　　　first  key  found in the secret keyring.  Note that -u or --local-user overrides this option.<br>
+　　　　　　This option may be given multiple times.  In this case, the last key for which a  secret  key<br>
+　　　　　　is  available  is used.  If there is no secret key available for any of the specified values,<br>
+　　　　　　GnuPG will not emit an error message but continue as if this option wasn't given.<br>
+<br>
+　　　--default-recipient name<br>
+　　　　　　Use name as default recipient if option --recipient is not used and don't ask if  this  is  a<br>
+　　　　　　valid one. name must be non-empty.<br>
+<br>
+　　　--default-recipient-self<br>
+　　　　　　Use  the  default key as default recipient if option --recipient is not used and don't ask if<br>
+　　　　　　this is a valid one. The default key is the first one from the secret keyring or the one  set<br>
+　　　　　　with --default-key.<br>
+<br>
+　　　--no-default-recipient<br>
+　　　　　　Reset --default-recipient and --default-recipient-self.<br>
+<br>
+　　　-v, --verbose<br>
+　　　　　　Give more information during processing. If used twice, the input data is listed in detail.<br>
+<br>
+　　　--no-verbose<br>
+　　　　　　Reset verbose level to 0.<br>
+<br>
+　　　-q, --quiet<br>
+　　　　　　Try to be as quiet as possible.<br>
+<br>
+　　　--batch<br>
+　　　--no-batch<br>
+　　　　　　Use  batch mode.  Never ask, do not allow interactive commands.  --no-batch disables this op‐<br>
+　　　　　　tion.  Note that even with a filename given on the command line, gpg might still need to read<br>
+　　　　　　from  STDIN  (in particular if gpg figures that the input is a detached signature and no data<br>
+　　　　　　file has been specified).  Thus if you do not want to feed data via STDIN, you should connect<br>
+　　　　　　STDIN to g‘/dev/null’.<br>
+<br>
+　　　　　　It  is  highly  recommended to use this option along with the options --status-fd and --with-<br>
+　　　　　　colons for any unattended use of gpg.<br>
+<br>
+　　　--no-tty<br>
+　　　　　　Make sure that the TTY (terminal) is never used for any output.  This  option  is  needed  in<br>
+　　　　　　some cases because GnuPG sometimes prints warnings to the TTY even if --batch is used.<br>
+<br>
+　　　--yes  Assume "yes" on most questions.<br>
+<br>
+　　　--no   Assume "no" on most questions.<br>
+<br>
+　　　--list-options parameters<br>
+　　　　　　This  is a space or comma delimited string that gives options used when listing keys and sig‐<br>
+　　　　　　natures (that is, --list-keys,  --check-signatures,  --list-public-keys,  --list-secret-keys,<br>
+　　　　　　and the --edit-key functions).  Options can be prepended with a no- (after the two dashes) to<br>
+　　　　　　give the opposite meaning.  The options are:<br>
+<br>
+　　　　　　show-photos<br>
+　　　　　　　　　Causes --list-keys, --check-signatures, --list-public-keys, and --list-secret-keys  to<br>
+　　　　　　　　　display  any  photo IDs attached to the key.  Defaults to no. See also --photo-viewer.<br>
+　　　　　　　　　Does not work with --with-colons: see --attribute-fd for the appropriate  way  to  get<br>
+　　　　　　　　　photo data for scripts and other frontends.<br>
+<br>
+　　　　　　show-usage<br>
+　　　　　　　　　Show  usage  information  for keys and subkeys in the standard key listing.  This is a<br>
+　　　　　　　　　list of letters indicating the allowed  usage  for  a  key  (E=encryption,  S=signing,<br>
+　　　　　　　　　C=certification, A=authentication).  Defaults to yes.<br>
+<br>
+　　　　　　show-policy-urls<br>
+　　　　　　　　　Show policy URLs in the  --check-signatures listings.  Defaults to no.<br>
+<br>
+　　　　　　show-notations<br>
+　　　　　　show-std-notations<br>
+　　　　　　show-user-notations<br>
+　　　　　　　　　Show all, IETF standard, or user-defined signature notations in the --check-signatures<br>
+　　　　　　　　　listings. Defaults to no.<br>
+<br>
+　　　　　　show-keyserver-urls<br>
+　　　　　　　　　Show any preferred keyserver URL in the --check-signatures listings. Defaults to no.<br>
+<br>
+　　　　　　show-uid-validity<br>
+　　　　　　　　　Display the calculated validity of user IDs during key listings.  Defaults to yes.<br>
+<br>
+　　　　　　show-unusable-uids<br>
+　　　　　　　　　Show revoked and expired user IDs in key listings. Defaults to no.<br>
+<br>
+　　　　　　show-unusable-subkeys<br>
+　　　　　　　　　Show revoked and expired subkeys in key listings. Defaults to no.<br>
+<br>
+　　　　　　show-keyring<br>
+　　　　　　　　　Display the keyring name at the head of key listings to show which keyring a given key<br>
+　　　　　　　　　resides on. Defaults to no.<br>
+<br>
+　　　　　　show-sig-expire<br>
+　　　　　　　　　Show  signature expiration dates (if any) during --check-signatures listings. Defaults<br>
+　　　　　　　　　to no.<br>
+<br>
+　　　　　　show-sig-subpackets<br>
+　　　　　　　　　Include signature subpackets in the key listing. This option can take an optional  ar‐<br>
+　　　　　　　　　gument  list of the subpackets to list. If no argument is passed, list all subpackets.<br>
+　　　　　　　　　Defaults to no. This option is only meaningful when  using  --with-colons  along  with<br>
+　　　　　　　　　--check-signatures.<br>
+<br>
+　　　　　　show-only-fpr-mbox<br>
+　　　　　　　　　For each user-id which has a valid mail address print only the fingerprint followed by<br>
+　　　　　　　　　the mail address.<br>
+<br>
+　　　--verify-options parameters<br>
+　　　　　　This is a space or comma delimited string that gives options used when verifying  signatures.<br>
+　　　　　　Options can be prepended with a `no-' to give the opposite meaning. The options are:<br>
+<br>
+　　　　　　show-photos<br>
+　　　　　　　　　Display  any  photo IDs present on the key that issued the signature.  Defaults to no.<br>
+　　　　　　　　　See also --photo-viewer.<br>
+<br>
+　　　　　　show-policy-urls<br>
+　　　　　　　　　Show policy URLs in the signature being verified. Defaults to yes.<br>
+<br>
+　　　　　　show-notations<br>
+　　　　　　show-std-notations<br>
+　　　　　　show-user-notations<br>
+　　　　　　　　　Show all, IETF standard, or user-defined signature notations in  the  signature  being<br>
+　　　　　　　　　verified. Defaults to IETF standard.<br>
+<br>
+　　　　　　show-keyserver-urls<br>
+　　　　　　　　　Show any preferred keyserver URL in the signature being verified.  Defaults to yes.<br>
+<br>
+　　　　　　show-uid-validity<br>
+　　　　　　　　　Display  the calculated validity of the user IDs on the key that issued the signature.<br>
+　　　　　　　　　Defaults to yes.<br>
+<br>
+　　　　　　show-unusable-uids<br>
+　　　　　　　　　Show revoked and expired user IDs during signature verification.  Defaults to no.<br>
+<br>
+　　　　　　show-primary-uid-only<br>
+　　　　　　　　　Show only the primary user ID during signature verification.   That  is  all  the  AKA<br>
+　　　　　　　　　lines as well as photo Ids are not shown with the signature verification status.<br>
+<br>
+　　　　　　pka-lookups<br>
+　　　　　　　　　Enable  PKA  lookups to verify sender addresses. Note that PKA is based on DNS, and so<br>
+　　　　　　　　　enabling this option may disclose information on when and what signatures are verified<br>
+　　　　　　　　　or  to  whom  data  is  encrypted.  This is similar to the "web bug" described for the<br>
+　　　　　　　　　--auto-key-retrieve option.<br>
+<br>
+　　　　　　pka-trust-increase<br>
+　　　　　　　　　Raise the trust in a signature to full if the signature passes  PKA  validation.  This<br>
+　　　　　　　　　option is only meaningful if pka-lookups is set.<br>
+<br>
+　　　--enable-large-rsa<br>
+　　　--disable-large-rsa<br>
+　　　　　　With --generate-key and --batch, enable the creation of RSA secret keys as large as 8192 bit.<br>
+　　　　　　Note: 8192 bit is more than is generally recommended.  These large keys  don't  significantly<br>
+　　　　　　improve security, but they are more expensive to use, and their signatures and certifications<br>
+　　　　　　are larger.  This option is only available if the binary was build with large-secmem support.<br>
+<br>
+　　　--enable-dsa2<br>
+　　　--disable-dsa2<br>
+　　　　　　Enable hash truncation for all DSA keys even for old DSA Keys up to 1024 bit.  This  is  also<br>
+　　　　　　the default with --openpgp.  Note that older versions of GnuPG also required this flag to al‐<br>
+　　　　　　low the generation of DSA larger than 1024 bit.<br>
+<br>
+　　　--photo-viewer string<br>
+　　　　　　This is the command line that should be run to view a photo ID. "%i" will be  expanded  to  a<br>
+　　　　　　filename  containing  the photo. "%I" does the same, except the file will not be deleted once<br>
+　　　　　　the viewer exits.  Other flags are "%k" for the key ID, "%K" for the long key  ID,  "%f"  for<br>
+　　　　　　the key fingerprint, "%t" for the extension of the image type (e.g. "jpg"), "%T" for the MIME<br>
+　　　　　　type of the image (e.g. "image/jpeg"), "%v" for the single-character calculated  validity  of<br>
+　　　　　　the  image  being  viewed  (e.g.  "f"),  "%V"  for  the calculated validity as a string (e.g.<br>
+　　　　　　"full"), "%U" for a base32 encoded hash of the user ID, and "%%" for an actual percent  sign.<br>
+　　　　　　If  neither  %i  or %I are present, then the photo will be supplied to the viewer on standard<br>
+　　　　　　input.<br>
+<br>
+　　　　　　On Unix the default viewer is xloadimage -fork -quiet -title 'KeyID 0x%k' STDIN with a  fall‐<br>
+　　　　　　back  to display -title 'KeyID 0x%k' %i and finally to xdg-open %i.  On Windows !ShellExecute<br>
+　　　　　　400 %i is used; here the command is a meta command to use that API call followed  by  a  wait<br>
+　　　　　　time  in  milliseconds which is used to give the viewer time to read the temporary image file<br>
+　　　　　　before gpg deletes it again.  Note that if your image viewer program is not secure, then exe‐<br>
+　　　　　　cuting it from gpg does not make it secure.<br>
+<br>
+　　　--exec-path string<br>
+　　　　　　Sets  a list of directories to search for photo viewers If not provided photo viewers use the<br>
+　　　　　　PATH environment variable.<br>
+<br>
+　　　--keyring file<br>
+　　　　　　Add file to the current list of keyrings. If file begins with a tilde and a slash, these  are<br>
+　　　　　　replaced  by  the $HOME directory. If the filename does not contain a slash, it is assumed to<br>
+　　　　　　be in the GnuPG home directory ("~/.gnupg" if --homedir or $GNUPGHOME is not used).<br>
+<br>
+　　　　　　Note that this adds a keyring to the current list. If the intent  is  to  use  the  specified<br>
+　　　　　　keyring alone, use --keyring along with --no-default-keyring.<br>
+<br>
+　　　　　　If the option --no-keyring has been used no keyrings will be used at all.<br>
+<br>
+　　　--secret-keyring file<br>
+　　　　　　This  is  an  obsolete  option and ignored.  All secret keys are stored in the ‘private-keys-<br>
+　　　　　　v1.d’ directory below the GnuPG home directory.<br>
+<br>
+　　　--primary-keyring file<br>
+　　　　　　Designate file as the primary public keyring. This means that newly imported keys (via  --im‐<br>
+　　　　　　port or keyserver --recv-from) will go to this keyring.<br>
+<br>
+　　　--trustdb-name file<br>
+　　　　　　Use  file  instead of the default trustdb. If file begins with a tilde and a slash, these are<br>
+　　　　　　replaced by the $HOME directory. If the filename does not contain a slash, it is  assumed  to<br>
+　　　　　　be in the GnuPG home directory (‘~/.gnupg’ if --homedir or $GNUPGHOME is not used).<br>
+<br>
+　　　--homedir dir<br>
+　　　　　　Set the name of the home directory to dir. If this option is not used, the home directory de‐<br>
+　　　　　　faults to ‘~/.gnupg’.  It is only recognized when given on the command line.  It  also  over‐<br>
+　　　　　　rides  any  home directory stated through the environment variable ‘GNUPGHOME’ or (on Windows<br>
+　　　　　　systems) by means of the Registry entry HKCU\Software\GNU\GnuPG:HomeDir.<br>
+<br>
+　　　　　　On Windows systems it is possible to install GnuPG as a portable application.  In  this  case<br>
+　　　　　　only  this  command line option is considered, all other ways to set a home directory are ig‐<br>
+　　　　　　nored.<br>
+<br>
+　　　　　　To install GnuPG as a portable application under Windows, create an empty  file  named  ‘gpg‐<br>
+　　　　　　conf.ctl’  in  the same directory as the tool ‘gpgconf.exe’.  The root of the installation is<br>
+　　　　　　then that directory; or, if ‘gpgconf.exe’ has been installed directly below a directory named<br>
+　　　　　　‘bin’, its parent directory.  You also need to make sure that the following directories exist<br>
+　　　　　　and are writable: ‘ROOT/home’ for the GnuPG  home  and  ‘ROOT/var/cache/gnupg’  for  internal<br>
+　　　　　　cache files.<br>
+<br>
+　　　--display-charset name<br>
+　　　　　　Set  the name of the native character set. This is used to convert some informational strings<br>
+　　　　　　like user IDs to the proper UTF-8 encoding.  Note that this has nothing to do with the  char‐<br>
+　　　　　　acter  set  of  data  to be encrypted or signed; GnuPG does not recode user-supplied data. If<br>
+　　　　　　this option is not used, the default character set is determined from the current  locale.  A<br>
+　　　　　　verbosity level of 3 shows the chosen set.  Valid values for name are:<br>
+<br>
+　　　　　　iso-8859-1<br>
+　　　　　　　　　This is the Latin 1 set.<br>
+<br>
+　　　　　　iso-8859-2<br>
+　　　　　　　　　The Latin 2 set.<br>
+<br>
+　　　　　　iso-8859-15<br>
+　　　　　　　　　This is currently an alias for the Latin 1 set.<br>
+<br>
+　　　　　　koi8-r The usual Russian set (RFC-1489).<br>
+<br>
+　　　　　　utf-8  Bypass all translations and assume that the OS uses native UTF-8 encoding.<br>
+<br>
+　　　--utf8-strings<br>
+　　　--no-utf8-strings<br>
+　　　　　　Assume  that  command  line  arguments  are  given  as  UTF-8  strings.  The  default  (--no-<br>
+　　　　　　utf8-strings) is to assume that arguments are encoded in the character set  as  specified  by<br>
+　　　　　　--display-charset.  These  options  affect  all following arguments. Both options may be used<br>
+　　　　　　multiple times.<br>
+<br>
+　　　--options file<br>
+　　　　　　Read options from file and do not try to read them from the default options file in the home‐<br>
+　　　　　　dir (see --homedir). This option is ignored if used in an options file.<br>
+<br>
+　　　--no-options<br>
+　　　　　　Shortcut for --options /dev/null. This option is detected before an attempt to open an option<br>
+　　　　　　file.  Using this option will also prevent the creation of a ‘~/.gnupg’ homedir.<br>
+<br>
+　　　-z n<br>
+　　　--compress-level n<br>
+　　　--bzip2-compress-level n<br>
+　　　　　　Set compression level to n for the ZIP and ZLIB compression algorithms. The default is to use<br>
+　　　　　　the  default compression level of zlib (normally 6). --bzip2-compress-level sets the compres‐<br>
+　　　　　　sion level for the BZIP2 compression algorithm (defaulting to 6 as well). This is a different<br>
+　　　　　　option  from  --compress-level since BZIP2 uses a significant amount of memory for each addi‐<br>
+　　　　　　tional compression level.  -z sets both. A value of 0 for n disables compression.<br>
+<br>
+　　　--bzip2-decompress-lowmem<br>
+　　　　　　Use a different decompression method for BZIP2 compressed files. This alternate method uses a<br>
+　　　　　　bit  more than half the memory, but also runs at half the speed. This is useful under extreme<br>
+　　　　　　low memory circumstances when the file was originally compressed at a high  --bzip2-compress-<br>
+　　　　　　level.<br>
+<br>
+　　　--mangle-dos-filenames<br>
+　　　--no-mangle-dos-filenames<br>
+　　　　　　Older  version  of Windows cannot handle filenames with more than one dot. --mangle-dos-file‐<br>
+　　　　　　names causes GnuPG to replace (rather than add to) the extension of  an  output  filename  to<br>
+　　　　　　avoid this problem. This option is off by default and has no effect on non-Windows platforms.<br>
+<br>
+　　　--ask-cert-level<br>
+　　　--no-ask-cert-level<br>
+　　　　　　When  making  a key signature, prompt for a certification level. If this option is not speci‐<br>
+　　　　　　fied, the certification level used is set via --default-cert-level. See  --default-cert-level<br>
+　　　　　　for  information  on  the specific levels and how they are used. --no-ask-cert-level disables<br>
+　　　　　　this option. This option defaults to no.<br>
+<br>
+　　　--default-cert-level n<br>
+　　　　　　The default to use for the check level when signing a key.<br>
+<br>
+　　　　　　0 means you make no particular claim as to how carefully you verified the key.<br>
+<br>
+　　　　　　1 means you believe the key is owned by the person who claims to own it but you could not, or<br>
+　　　　　　did  not  verify  the key at all. This is useful for a "persona" verification, where you sign<br>
+　　　　　　the key of a pseudonymous user.<br>
+<br>
+　　　　　　2 means you did casual verification of the key. For example, this could mean that  you  veri‐<br>
+　　　　　　fied the key fingerprint and checked the user ID on the key against a photo ID.<br>
+<br>
+　　　　　　3 means you did extensive verification of the key. For example, this could mean that you ver‐<br>
+　　　　　　ified the key fingerprint with the owner of the key in person, and that you checked, by means<br>
+　　　　　　of  a  hard  to  forge document with a photo ID (such as a passport) that the name of the key<br>
+　　　　　　owner matches the name in the user ID on the key, and finally that you verified (by  exchange<br>
+　　　　　　of email) that the email address on the key belongs to the key owner.<br>
+<br>
+　　　　　　Note that the examples given above for levels 2 and 3 are just that: examples. In the end, it<br>
+　　　　　　is up to you to decide just what "casual" and "extensive" mean to you.<br>
+<br>
+　　　　　　This option defaults to 0 (no particular claim).<br>
+<br>
+　　　--min-cert-level<br>
+　　　　　　When building the trust database, treat any signatures with a certification level below  this<br>
+　　　　　　as invalid. Defaults to 2, which disregards level 1 signatures. Note that level 0 "no partic‐<br>
+　　　　　　ular claim" signatures are always accepted.<br>
+<br>
+　　　--trusted-key long key ID or fingerprint<br>
+　　　　　　Assume that the specified key (which must be given as a full 8 byte key ID or 20 byte finger‐<br>
+　　　　　　print)  is  as trustworthy as one of your own secret keys. This option is useful if you don't<br>
+　　　　　　want to keep your secret keys (or one of them) online but still want to be able to check  the<br>
+　　　　　　validity of a given recipient's or signator's key.<br>
+<br>
+　　　--trust-model {pgp|classic|tofu|tofu+pgp|direct|always|auto}<br>
+　　　　　　Set what trust model GnuPG should follow. The models are:<br>
+<br>
+　　　　　　pgp    This  is the Web of Trust combined with trust signatures as used in PGP 5.x and later.<br>
+　　　　　　　　　This is the default trust model when creating a new trust database.<br>
+<br>
+　　　　　　classic<br>
+　　　　　　　　　This is the standard Web of Trust as introduced by PGP 2.<br>
+<br>
+　　　　　　tofu<br>
+<br>
+　　　　　　　　　TOFU stands for Trust On First Use.  In this trust model, the  first  time  a  key  is<br>
+　　　　　　　　　seen,  it  is  memorized.  If later another key with a user id with the same email ad‐<br>
+　　　　　　　　　dress is seen, both keys are marked as suspect.  In that case, the next time either is<br>
+　　　　　　　　　used,  a warning is displayed describing the conflict, why it might have occurred (ei‐<br>
+　　　　　　　　　ther the user generated a new key and failed to cross sign the old and new  keys,  the<br>
+　　　　　　　　　key  is  forgery,  or  a man-in-the-middle attack is being attempted), and the user is<br>
+　　　　　　　　　prompted to manually confirm the validity of the key in question.<br>
+<br>
+　　　　　　　　　Because a potential attacker is able to control the email address and thereby  circum‐<br>
+　　　　　　　　　vent the conflict detection algorithm by using an email address that is similar in ap‐<br>
+　　　　　　　　　pearance to a trusted email address, whenever a message is verified, statistics  about<br>
+　　　　　　　　　the  number of messages signed with the key are shown.  In this way, a user can easily<br>
+　　　　　　　　　identify attacks using fake keys for regular correspondents.<br>
+<br>
+　　　　　　　　　When compared with the Web of Trust, TOFU offers significantly weaker security guaran‐<br>
+　　　　　　　　　tees.   In  particular,  TOFU only helps ensure consistency (that is, that the binding<br>
+　　　　　　　　　between a key and email address doesn't change).  A major advantage of TOFU is that it<br>
+　　　　　　　　　requires  little  maintenance to use correctly.  To use the web of trust properly, you<br>
+　　　　　　　　　need to actively sign keys and mark users as trusted introducers.  This is a time-con‐<br>
+　　　　　　　　　suming  process  and  anecdotal  evidence  suggests that even security-conscious users<br>
+　　　　　　　　　rarely take the time to do this thoroughly and instead rely on an ad-hoc TOFU process.<br>
+<br>
+　　　　　　　　　In the TOFU model, policies are associated with bindings between keys  and  email  ad‐<br>
+　　　　　　　　　dresses  (which are extracted from user ids and normalized).  There are five policies,<br>
+　　　　　　　　　which can be set manually using the --tofu-policy option.  The default policy  can  be<br>
+　　　　　　　　　set using the --tofu-default-policy option.<br>
+<br>
+　　　　　　　　　The  TOFU  policies are: auto, good, unknown, bad and ask.  The auto policy is used by<br>
+　　　　　　　　　default (unless overridden by --tofu-default-policy) and marks a binding as marginally<br>
+　　　　　　　　　trusted.   The good, unknown and bad policies mark a binding as fully trusted, as hav‐<br>
+　　　　　　　　　ing unknown trust or as having trust never, respectively.  The unknown policy is  use‐<br>
+　　　　　　　　　ful  for  just using TOFU to detect conflicts, but to never assign positive trust to a<br>
+　　　　　　　　　binding.  The final policy, ask prompts the user to indicate the binding's trust.   If<br>
+　　　　　　　　　batch mode is enabled (or input is inappropriate in the context), then the user is not<br>
+　　　　　　　　　prompted and the undefined trust level is returned.<br>
+<br>
+　　　　　　tofu+pgp<br>
+　　　　　　　　　This trust model combines TOFU with the Web of Trust.  This is done by  computing  the<br>
+　　　　　　　　　trust  level  for  each  model and then taking the maximum trust level where the trust<br>
+　　　　　　　　　levels are ordered as follows: unknown < undefined < marginal < fully < ultimate < ex‐<br>
+　　　　　　　　　pired < never.<br>
+<br>
+　　　　　　　　　By  setting --tofu-default-policy=unknown, this model can be used to implement the web<br>
+　　　　　　　　　of trust with TOFU's conflict detection algorithm, but without its assignment of posi‐<br>
+　　　　　　　　　tive trust values, which some security-conscious users don't like.<br>
+<br>
+　　　　　　direct Key  validity  is  set  directly  by the user and not calculated via the Web of Trust.<br>
+　　　　　　　　　This model is solely based on the key and does not distinguish user  IDs.   Note  that<br>
+　　　　　　　　　when  changing  to  another  trust model the trust values assigned to a key are trans‐<br>
+　　　　　　　　　formed into ownertrust values, which also indicate how you trust the owner of the  key<br>
+　　　　　　　　　to sign other keys.<br>
+<br>
+　　　　　　always Skip  key  validation  and assume that used keys are always fully valid. You generally<br>
+　　　　　　　　　won't use this unless you are using some external validation scheme. This option  also<br>
+　　　　　　　　　suppresses  the  "[uncertain]" tag printed with signature checks when there is no evi‐<br>
+　　　　　　　　　dence that the user ID is bound to the key.  Note that this trust model still does not<br>
+　　　　　　　　　allow the use of expired, revoked, or disabled keys.<br>
+<br>
+　　　　　　auto   Select the trust model depending on whatever the internal trust database says. This is<br>
+　　　　　　　　　the default model if such a database already exists.  Note that a tofu trust model  is<br>
+　　　　　　　　　not considered here and must be enabled explicitly.<br>
+<br>
+　　　--auto-key-locate mechanisms<br>
+　　　--no-auto-key-locate<br>
+　　　　　　GnuPG  can  automatically locate and retrieve keys as needed using this option.  This happens<br>
+　　　　　　when encrypting to an email address (in  the  "user@example.com"  form),  and  there  are  no<br>
+　　　　　　"user@example.com" keys on the local keyring.  This option takes any number of the mechanisms<br>
+　　　　　　listed below, in the order they are to be tried.  Instead of listing the mechanisms as  comma<br>
+　　　　　　delimited  arguments,  the option may also be given several times to add more mechanism.  The<br>
+　　　　　　option --no-auto-key-locate or the mechanism "clear" resets the list.  The  default  is  "lo‐<br>
+　　　　　　cal,wkd".<br>
+<br>
+　　　　　　cert   Locate a key using DNS CERT, as specified in RFC-4398.<br>
+<br>
+　　　　　　pka    Locate a key using DNS PKA.<br>
+<br>
+　　　　　　dane   Locate a key using DANE, as specified in draft-ietf-dane-openpgpkey-05.txt.<br>
+<br>
+　　　　　　wkd    Locate a key using the Web Key Directory protocol.<br>
+<br>
+　　　　　　ldap   Using  DNS  Service Discovery, check the domain in question for any LDAP keyservers to<br>
+　　　　　　　　　use.  If this fails, attempt to locate the key  using  the  PGP  Universal  method  of<br>
+　　　　　　　　　checking ‘ldap://keys.(thedomain)’.<br>
+<br>
+　　　　　　ntds   Locate the key using the Active Directory (Windows only).<br>
+<br>
+　　　　　　keyserver<br>
+　　　　　　　　　Locate a key using a keyserver.<br>
+<br>
+　　　　　　keyserver-URL<br>
+　　　　　　　　　In  addition, a keyserver URL as used in the dirmngr configuration may be used here to<br>
+　　　　　　　　　query that particular keyserver.<br>
+<br>
+　　　　　　local  Locate the key using the local keyrings.  This mechanism allows the user to select the<br>
+　　　　　　　　　order  a  local key lookup is done.  Thus using ‘--auto-key-locate local’ is identical<br>
+　　　　　　　　　to --no-auto-key-locate.<br>
+<br>
+　　　　　　nodefault<br>
+　　　　　　　　　This flag disables the standard local key lookup, done before any  of  the  mechanisms<br>
+　　　　　　　　　defined  by  the  --auto-key-locate  are tried.  The position of this mechanism in the<br>
+　　　　　　　　　list does not matter.  It is not required if local is also used.<br>
+<br>
+　　　　　　clear  Clear all defined mechanisms.  This is useful to override mechanisms given in a config<br>
+　　　　　　　　　file.  Note that a nodefault in mechanisms will also be cleared unless it is given af‐<br>
+　　　　　　　　　ter the clear.<br>
+<br>
+　　　--auto-key-import<br>
+　　　--no-auto-key-import<br>
+　　　　　　This is an offline mechanism to get a missing key for signature verification  and  for  later<br>
+　　　　　　encryption  to this key.  If this option is enabled and a signature includes an embedded key,<br>
+　　　　　　that key is used to verify the signature and on verification success that  key  is  imported.<br>
+　　　　　　The default is --no-auto-key-import.<br>
+<br>
+　　　　　　On  the sender (signing) site the option --include-key-block needs to be used to put the pub‐<br>
+　　　　　　lic part of the signing key as “Key Block subpacket” into the signature.<br>
+<br>
+　　　--auto-key-retrieve<br>
+　　　--no-auto-key-retrieve<br>
+　　　　　　These options enable or disable the automatic retrieving of keys from a keyserver when  veri‐<br>
+　　　　　　fying  signatures  made by keys that are not on the local keyring.  The default is --no-auto-<br>
+　　　　　　key-retrieve.<br>
+<br>
+　　　　　　The order of methods tried to lookup the key is:<br>
+<br>
+　　　　　　1. If the option --auto-key-import is set and the signatures includes an embedded  key,  that<br>
+　　　　　　key is used to verify the signature and on verification success that key is imported.<br>
+<br>
+　　　　　　2.  If a preferred keyserver is specified in the signature and the option honor-keyserver-url<br>
+　　　　　　is active (which is not the default), that keyserver is tried.  Note that the creator of  the<br>
+　　　　　　signature  uses  the  option  --sig-keyserver-url to specify the preferred keyserver for data<br>
+　　　　　　signatures.<br>
+<br>
+　　　　　　3. If the signature has the Signer's UID set (e.g. using --sender while creating  the  signa‐<br>
+　　　　　　ture) a Web Key Directory (WKD) lookup is done.  This is the default configuration but can be<br>
+　　　　　　disabled by removing WKD from the auto-key-locate list or  by  using  the  option  --disable-<br>
+　　　　　　signer-uid.<br>
+<br>
+　　　　　　4. If the option honor-pka-record is active, the legacy PKA method is used.<br>
+<br>
+　　　　　　5.  If any keyserver is configured and the Issuer Fingerprint is part of the signature (since<br>
+　　　　　　GnuPG 2.1.16), the configured keyservers are tried.<br>
+<br>
+　　　　　　Note that this option makes a "web bug" like behavior possible.  Keyserver or Web Key  Direc‐<br>
+　　　　　　tory  operators can see which keys you request, so by sending you a message signed by a brand<br>
+　　　　　　new key (which you naturally will not have on your local keyring), the operator can tell both<br>
+　　　　　　your IP address and the time when you verified the signature.<br>
+<br>
+　　　--keyid-format {none|short|0xshort|long|0xlong}<br>
+　　　　　　Select  how to display key IDs.  "none" does not show the key ID at all but shows the finger‐<br>
+　　　　　　print in a separate line.  "short" is the traditional 8-character key ID.  "long" is the more<br>
+　　　　　　accurate (but less convenient) 16-character key ID.  Add an "0x" to either to include an "0x"<br>
+　　　　　　at the beginning of the key ID, as in 0x99242560.  Note that this option is  ignored  if  the<br>
+　　　　　　option --with-colons is used.<br>
+<br>
+　　　--keyserver name<br>
+　　　　　　This option is deprecated - please use the --keyserver in ‘dirmngr.conf’ instead.<br>
+<br>
+　　　　　　Use  name  as  your  keyserver.  This  is  the  server  that --receive-keys, --send-keys, and<br>
+　　　　　　--search-keys will communicate with to receive keys from, send keys to, and search  for  keys<br>
+　　　　　　on. The format of the name is a URI: `scheme:[//]keyservername[:port]' The scheme is the type<br>
+　　　　　　of keyserver: "hkp" for the HTTP (or compatible) keyservers, "ldap" for the LDAP  keyservers,<br>
+　　　　　　or  "mailto"  for  the Graff email keyserver. Note that your particular installation of GnuPG<br>
+　　　　　　may have other keyserver types available as well. Keyserver schemes are case-insensitive. Af‐<br>
+　　　　　　ter  the  keyserver name, optional keyserver configuration options may be provided. These are<br>
+　　　　　　the same as the global --keyserver-options from below, but apply only to this particular key‐<br>
+　　　　　　server.<br>
+<br>
+　　　　　　Most  keyservers  synchronize  with each other, so there is generally no need to send keys to<br>
+　　　　　　more than one server. The keyserver hkp://keys.gnupg.net uses round robin DNS to give a  dif‐<br>
+　　　　　　ferent keyserver each time you use it.<br>
+<br>
+　　　--keyserver-options {name=value}<br>
+　　　　　　This  is  a space or comma delimited string that gives options for the keyserver. Options can<br>
+　　　　　　be prefixed with a `no-' to give the opposite meaning. Valid import-options or export-options<br>
+　　　　　　may  be  used here as well to apply to importing (--recv-key) or exporting (--send-key) a key<br>
+　　　　　　from a keyserver. While not all options are available for all keyserver  types,  some  common<br>
+　　　　　　options are:<br>
+<br>
+　　　　　　include-revoked<br>
+　　　　　　　　　When  searching for a key with --search-keys, include keys that are marked on the key‐<br>
+　　　　　　　　　server as revoked. Note that not all keyservers differentiate between revoked and  un‐<br>
+　　　　　　　　　revoked  keys, and for such keyservers this option is meaningless. Note also that most<br>
+　　　　　　　　　keyservers do not have cryptographic verification of key revocations, and  so  turning<br>
+　　　　　　　　　this option off may result in skipping keys that are incorrectly marked as revoked.<br>
+<br>
+　　　　　　include-disabled<br>
+　　　　　　　　　When  searching for a key with --search-keys, include keys that are marked on the key‐<br>
+　　　　　　　　　server as disabled. Note that this option is not used with HKP keyservers.<br>
+<br>
+　　　　　　auto-key-retrieve<br>
+　　　　　　　　　This is an obsolete alias for the option auto-key-retrieve.  Please do not use it;  it<br>
+　　　　　　　　　will be removed in future versions..<br>
+<br>
+　　　　　　honor-keyserver-url<br>
+　　　　　　　　　When  using --refresh-keys, if the key in question has a preferred keyserver URL, then<br>
+　　　　　　　　　use that preferred keyserver to refresh the key from.  In  addition,  if  auto-key-re‐<br>
+　　　　　　　　　trieve  is  set,  and the signature being verified has a preferred keyserver URL, then<br>
+　　　　　　　　　use that preferred keyserver to fetch the key from. Note that this option introduces a<br>
+　　　　　　　　　"web  bug":  The creator of the key can see when the keys is refreshed.  Thus this op‐<br>
+　　　　　　　　　tion is not enabled by default.<br>
+<br>
+　　　　　　honor-pka-record<br>
+　　　　　　　　　If --auto-key-retrieve is used, and the signature being verified  has  a  PKA  record,<br>
+　　　　　　　　　then use the PKA information to fetch the key. Defaults to "yes".<br>
+<br>
+　　　　　　include-subkeys<br>
+　　　　　　　　　When  receiving  a key, include subkeys as potential targets. Note that this option is<br>
+　　　　　　　　　not used with HKP keyservers, as they do not support retrieving keys by subkey id.<br>
+<br>
+　　　　　　timeout<br>
+　　　　　　http-proxy=value<br>
+　　　　　　verbose<br>
+　　　　　　debug<br>
+　　　　　　check-cert<br>
+<br>
+　　　　　　ca-cert-file<br>
+　　　　　　　　　These options have no more function since GnuPG 2.1.  Use  the  dirmngr  configuration<br>
+　　　　　　　　　options instead.<br>
+<br>
+　　　The  default  list  of  options  is: "self-sigs-only, repair-keys, repair-pks-subkey-bug, export-at‐<br>
+　　　tributes, honor-pka-record".<br>
+<br>
+　　　--completes-needed n<br>
+　　　　　　Number of completely trusted users to introduce a new key signer (defaults to 1).<br>
+<br>
+　　　--marginals-needed n<br>
+　　　　　　Number of marginally trusted users to introduce a new key signer (defaults to 3)<br>
+<br>
+　　　--tofu-default-policy {auto|good|unknown|bad|ask}<br>
+　　　　　　The default TOFU policy (defaults to auto).  For more information about the meaning  of  this<br>
+　　　　　　option, see: [trust-model-tofu].<br>
+<br>
+　　　--max-cert-depth n<br>
+　　　　　　Maximum depth of a certification chain (default is 5).<br>
+<br>
+　　　--no-sig-cache<br>
+　　　　　　Do  not cache the verification status of key signatures.  Caching gives a much better perfor‐<br>
+　　　　　　mance in key listings. However, if you suspect that your public keyring is not  safe  against<br>
+　　　　　　write  modifications,  you  can  use this option to disable the caching. It probably does not<br>
+　　　　　　make sense to disable it because all kind of damage can be done if someone else has write ac‐<br>
+　　　　　　cess to your public keyring.<br>
+<br>
+　　　--auto-check-trustdb<br>
+　　　--no-auto-check-trustdb<br>
+　　　　　　If  GnuPG  feels  that its information about the Web of Trust has to be updated, it automati‐<br>
+　　　　　　cally runs the --check-trustdb command internally.  This may be  a  time  consuming  process.<br>
+　　　　　　--no-auto-check-trustdb disables this option.<br>
+<br>
+　　　--use-agent<br>
+　　　--no-use-agent<br>
+　　　　　　This is dummy option. gpg always requires the agent.<br>
+<br>
+　　　--gpg-agent-info<br>
+　　　　　　This is dummy option. It has no effect when used with gpg.<br>
+<br>
+　　　--agent-program file<br>
+　　　　　　Specify  an  agent program to be used for secret key operations.  The default value is deter‐<br>
+　　　　　　mined by running gpgconf with the option --list-dirs.  Note that the pipe symbol (|) is  used<br>
+　　　　　　for a regression test suite hack and may thus not be used in the file name.<br>
+<br>
+　　　--dirmngr-program file<br>
+　　　　　　Specify  a  dirmngr  program  to  be  used  for  keyserver  access.   The  default  value  is<br>
+　　　　　　‘/usr/bin/dirmngr’.<br>
+<br>
+　　　--disable-dirmngr<br>
+　　　　　　Entirely disable the use of the Dirmngr.<br>
+<br>
+　　　--no-autostart<br>
+　　　　　　Do not start the gpg-agent or the dirmngr if it has not yet been started and its  service  is<br>
+　　　　　　required.   This  option  is  mostly useful on machines where the connection to gpg-agent has<br>
+　　　　　　been redirected to another machines.  If dirmngr is required on the remote machine, it may be<br>
+　　　　　　started manually using gpgconf --launch dirmngr.<br>
+<br>
+　　　--lock-once<br>
+　　　　　　Lock  the  databases the first time a lock is requested and do not release the lock until the<br>
+　　　　　　process terminates.<br>
+<br>
+　　　--lock-multiple<br>
+　　　　　　Release the locks every time a lock is no longer needed. Use  this  to  override  a  previous<br>
+　　　　　　--lock-once from a config file.<br>
+<br>
+　　　--lock-never<br>
+　　　　　　Disable locking entirely. This option should be used only in very special environments, where<br>
+　　　　　　it can be assured that only one process is accessing those files. A bootable  floppy  with  a<br>
+　　　　　　stand-alone  encryption system will probably use this. Improper usage of this option may lead<br>
+　　　　　　to data and key corruption.<br>
+<br>
+　　　--exit-on-status-write-error<br>
+　　　　　　This option will cause write errors on the status FD to immediately  terminate  the  process.<br>
+　　　　　　That should in fact be the default but it never worked this way and thus we need an option to<br>
+　　　　　　enable this, so that the change won't break applications which close their end of a status fd<br>
+　　　　　　connected  pipe  too early. Using this option along with --enable-progress-filter may be used<br>
+　　　　　　to cleanly cancel long running gpg operations.<br>
+<br>
+　　　--limit-card-insert-tries n<br>
+　　　　　　With n greater than 0 the number of prompts asking to insert a smartcard gets limited to N-1.<br>
+　　　　　　Thus  with  a  value  of 1 gpg won't at all ask to insert a card if none has been inserted at<br>
+　　　　　　startup. This option is useful in the configuration file in case an application does not know<br>
+　　　　　　about the smartcard support and waits ad infinitum for an inserted card.<br>
+<br>
+　　　--no-random-seed-file<br>
+　　　　　　GnuPG uses a file to store its internal random pool over invocations.  This makes random gen‐<br>
+　　　　　　eration faster; however sometimes write operations are not desired. This option can  be  used<br>
+　　　　　　to achieve that with the cost of slower random generation.<br>
+<br>
+　　　--no-greeting<br>
+　　　　　　Suppress the initial copyright message.<br>
+<br>
+　　　--no-secmem-warning<br>
+　　　　　　Suppress the warning about "using insecure memory".<br>
+<br>
+　　　--no-permission-warning<br>
+　　　　　　Suppress  the warning about unsafe file and home directory (--homedir) permissions. Note that<br>
+　　　　　　the permission checks that GnuPG performs are not intended to be  authoritative,  but  rather<br>
+　　　　　　they  simply  warn about certain common permission problems. Do not assume that the lack of a<br>
+　　　　　　warning means that your system is secure.<br>
+<br>
+　　　　　　Note that the warning for unsafe --homedir permissions cannot be suppressed in  the  gpg.conf<br>
+　　　　　　file, as this would allow an attacker to place an unsafe gpg.conf file in place, and use this<br>
+　　　　　　file to suppress warnings about itself. The --homedir permissions warning may  only  be  sup‐<br>
+　　　　　　pressed on the command line.<br>
+<br>
+　　　--require-secmem<br>
+　　　--no-require-secmem<br>
+　　　　　　Refuse  to  run if GnuPG cannot get secure memory. Defaults to no (i.e. run, but give a warn‐<br>
+　　　　　　ing).<br>
+<br>
+　　　--require-cross-certification<br>
+　　　--no-require-cross-certification<br>
+　　　　　　When verifying a signature made from a subkey, ensure that the cross certification "back sig‐<br>
+　　　　　　nature"  on  the  subkey is present and valid.  This protects against a subtle attack against<br>
+　　　　　　subkeys that can sign.  Defaults to --require-cross-certification for gpg.<br>
+<br>
+　　　--expert<br>
+　　　--no-expert<br>
+　　　　　　Allow the user to do certain nonsensical or "silly" things like signing an expired or revoked<br>
+　　　　　　key,  or certain potentially incompatible things like generating unusual key types. This also<br>
+　　　　　　disables certain warning messages about potentially incompatible actions.  As  the  name  im‐<br>
+　　　　　　plies,  this  option  is  for experts only. If you don't fully understand the implications of<br>
+　　　　　　what it allows you to do, leave this off. --no-expert disables this option.<br>
+<br>
+   Key related options<br>
+<br>
+　　　--recipient name<br>
+　　　-r     Encrypt for user id name. If this option or --hidden-recipient is not specified,  GnuPG  asks<br>
+　　　　　　for the user-id unless --default-recipient is given.<br>
+<br>
+　　　--hidden-recipient name<br>
+　　　-R     Encrypt  for  user ID name, but hide the key ID of this user's key. This option helps to hide<br>
+　　　　　　the receiver of the message and is a limited countermeasure against traffic analysis. If this<br>
+　　　　　　option or --recipient is not specified, GnuPG asks for the user ID unless --default-recipient<br>
+　　　　　　is given.<br>
+<br>
+　　　--recipient-file file<br>
+　　　-f     This option is similar to --recipient except that it encrypts to a key stored  in  the  given<br>
+　　　　　　file.   file must be the name of a file containing exactly one key.  gpg assumes that the key<br>
+　　　　　　in this file is fully valid.<br>
+<br>
+　　　--hidden-recipient-file file<br>
+　　　-F     This option is similar to --hidden-recipient except that it encrypts to a key stored  in  the<br>
+　　　　　　given  file.   file  must be the name of a file containing exactly one key.  gpg assumes that<br>
+　　　　　　the key in this file is fully valid.<br>
+<br>
+　　　--encrypt-to name<br>
+　　　　　　Same as --recipient but this one is intended for use in the options file and may be used with<br>
+　　　　　　your  own  user-id as an "encrypt-to-self". These keys are only used when there are other re‐<br>
+　　　　　　cipients given either by use of --recipient or by the asked user id.  No  trust  checking  is<br>
+　　　　　　performed for these user ids and even disabled keys can be used.<br>
+<br>
+　　　--hidden-encrypt-to name<br>
+　　　　　　Same  as  --hidden-recipient  but this one is intended for use in the options file and may be<br>
+　　　　　　used with your own user-id as a hidden "encrypt-to-self". These keys are only used when there<br>
+　　　　　　are  other  recipients  given either by use of --recipient or by the asked user id.  No trust<br>
+　　　　　　checking is performed for these user ids and even disabled keys can be used.<br>
+<br>
+　　　--no-encrypt-to<br>
+　　　　　　Disable the use of all --encrypt-to and --hidden-encrypt-to keys.<br>
+<br>
+　　　--group {name=value}<br>
+　　　　　　Sets up a named group, which is similar to aliases in email programs.   Any  time  the  group<br>
+　　　　　　name  is a recipient (-r or --recipient), it will be expanded to the values specified. Multi‐<br>
+　　　　　　ple groups with the same name are automatically merged into a single group.<br>
+<br>
+　　　　　　The values are key IDs or fingerprints, but any key description  is  accepted.  Note  that  a<br>
+　　　　　　value  with spaces in it will be treated as two different values. Note also there is only one<br>
+　　　　　　level of expansion --- you cannot make an group that points to another group. When used  from<br>
+　　　　　　the  command  line,  it  may be necessary to quote the argument to this option to prevent the<br>
+　　　　　　shell from treating it as multiple arguments.<br>
+<br>
+　　　--ungroup name<br>
+　　　　　　Remove a given entry from the --group list.<br>
+<br>
+　　　--no-groups<br>
+　　　　　　Remove all entries from the --group list.<br>
+<br>
+　　　--local-user name<br>
+　　　-u     Use name as the key to sign with. Note that this option overrides --default-key.<br>
+<br>
+　　　--sender mbox<br>
+　　　　　　This option has two purposes.  mbox must either be a complete user id with a proper mail  ad‐<br>
+　　　　　　dress or just a mail address.  When creating a signature this option tells gpg the user id of<br>
+　　　　　　a key used to make a signature if the key was not directly specified by a user id.  When ver‐<br>
+　　　　　　ifying  a  signature the mbox is used to restrict the information printed by the TOFU code to<br>
+　　　　　　matching user ids.<br>
+<br>
+　　　--try-secret-key name<br>
+　　　　　　For hidden recipients GPG needs to know the keys to use for trial decryption.   The  key  set<br>
+　　　　　　with  --default-key is always tried first, but this is often not sufficient.  This option al‐<br>
+　　　　　　lows setting more keys to be used for trial decryption.  Although any valid user-id  specifi‐<br>
+　　　　　　cation  may  be used for name it makes sense to use at least the long keyid to avoid ambigui‐<br>
+　　　　　　ties.  Note that gpg-agent might pop up a pinentry for a lot keys to do the trial decryption.<br>
+　　　　　　If  you  want to stop all further trial decryption you may use close-window button instead of<br>
+　　　　　　the cancel button.<br>
+<br>
+　　　--try-all-secrets<br>
+　　　　　　Don't look at the key ID as stored in the message but try all secret keys in turn to find the<br>
+　　　　　　right  decryption key. This option forces the behaviour as used by anonymous recipients (cre‐<br>
+　　　　　　ated by using --throw-keyids or --hidden-recipient) and might come handy in case where an en‐<br>
+　　　　　　crypted message contains a bogus key ID.<br>
+<br>
+　　　--skip-hidden-recipients<br>
+　　　--no-skip-hidden-recipients<br>
+　　　　　　During  decryption  skip all anonymous recipients.  This option helps in the case that people<br>
+　　　　　　use the hidden recipients feature to hide their own encrypt-to key from others.  If  one  has<br>
+　　　　　　many secret keys this may lead to a major annoyance because all keys are tried in turn to de‐<br>
+　　　　　　crypt something which was not really intended for it.  The drawback of this option is that it<br>
+　　　　　　is currently not possible to decrypt a message which includes real anonymous recipients.<br>
+<br>
+   Input and Output<br>
+<br>
+　　　--armor<br>
+　　　-a     Create ASCII armored output.  The default is to create the binary OpenPGP format.<br>
+<br>
+　　　--no-armor<br>
+　　　　　　Assume the input data is not in ASCII armored format.<br>
+<br>
+　　　--output file<br>
+　　　-o file<br>
+　　　　　　Write output to file.  To write to stdout use - as the filename.<br>
+<br>
+　　　--max-output n<br>
+　　　　　　This  option  sets  a  limit  on the number of bytes that will be generated when processing a<br>
+　　　　　　file. Since OpenPGP supports various levels of compression, it is possible that the plaintext<br>
+　　　　　　of a given message may be significantly larger than the original OpenPGP message. While GnuPG<br>
+　　　　　　works properly with such messages, there is often a desire to set a maximum  file  size  that<br>
+　　　　　　will  be generated before processing is forced to stop by the OS limits. Defaults to 0, which<br>
+　　　　　　means "no limit".<br>
+<br>
+　　　--input-size-hint n<br>
+　　　　　　This option can be used to tell GPG the size of the input data in bytes.  n must be  a  posi‐<br>
+　　　　　　tive  base-10 number.  This option is only useful if the input is not taken from a file.  GPG<br>
+　　　　　　may use this hint to optimize its buffer allocation strategy.  It is also used by the  --sta‐<br>
+　　　　　　tus-fd  line  ``PROGRESS'' to provide a value for ``total'' if that is not available by other<br>
+　　　　　　means.<br>
+<br>
+　　　--key-origin string[,url]<br>
+　　　　　　gpg can track the origin of a key. Certain origins are implicitly known (e.g. keyserver,  web<br>
+　　　　　　key  directory)  and  set.   For a standard import the origin of the keys imported can be set<br>
+　　　　　　with this option.  To list the possible values use "help" for string.  Some origins can store<br>
+　　　　　　an optional url argument.  That URL can appended to string after a comma.<br>
+<br>
+　　　--import-options parameters<br>
+　　　　　　This  is a space or comma delimited string that gives options for importing keys. Options can<br>
+　　　　　　be prepended with a `no-' to give the opposite meaning. The options are:<br>
+<br>
+　　　　　　import-local-sigs<br>
+　　　　　　　　　Allow importing key signatures marked as "local". This is not generally useful  unless<br>
+　　　　　　　　　a shared keyring scheme is being used.  Defaults to no.<br>
+<br>
+　　　　　　keep-ownertrust<br>
+　　　　　　　　　Normally  possible  still  existing ownertrust values of a key are cleared if a key is<br>
+　　　　　　　　　imported.  This is in general desirable so that a formerly deleted key does not  auto‐<br>
+　　　　　　　　　matically  gain  an  ownertrust  values merely due to import.  On the other hand it is<br>
+　　　　　　　　　sometimes necessary to re-import a trusted set of keys again but keeping  already  as‐<br>
+　　　　　　　　　signed ownertrust values.  This can be achieved by using this option.<br>
+<br>
+　　　　　　repair-pks-subkey-bug<br>
+　　　　　　　　　During  import, attempt to repair the damage caused by the PKS keyserver bug (pre ver‐<br>
+　　　　　　　　　sion 0.9.6) that mangles keys with multiple subkeys. Note that this cannot  completely<br>
+　　　　　　　　　repair  the  damaged key as some crucial data is removed by the keyserver, but it does<br>
+　　　　　　　　　at least give you back one subkey. Defaults to no for regular --import and to yes  for<br>
+　　　　　　　　　keyserver --receive-keys.<br>
+<br>
+　　　　　　import-show<br>
+　　　　　　show-only<br>
+　　　　　　　　　Show a listing of the key as imported right before it is stored.  This can be combined<br>
+　　　　　　　　　with the option --dry-run to only look at keys; the option show-only is a shortcut for<br>
+　　　　　　　　　this  combination.   The  command --show-keys is another shortcut for this.  Note that<br>
+　　　　　　　　　suffixes like '#' for "sec" and "sbb" lines may or may not be printed.<br>
+<br>
+　　　　　　import-export<br>
+　　　　　　　　　Run the entire import code but instead of storing the key to the local  keyring  write<br>
+　　　　　　　　　it  to  the  output.  The export options export-pka and export-dane affect the output.<br>
+　　　　　　　　　This option can be used to remove all invalid parts from a key  without  the  need  to<br>
+　　　　　　　　　store it.<br>
+<br>
+　　　　　　merge-only<br>
+　　　　　　　　　During import, allow key updates to existing keys, but do not allow any new keys to be<br>
+　　　　　　　　　imported. Defaults to no.<br>
+<br>
+　　　　　　import-clean<br>
+　　　　　　　　　After import, compact (remove all signatures except the self-signature) any  user  IDs<br>
+　　　　　　　　　from  the  new  key that are not usable.  Then, remove any signatures from the new key<br>
+　　　　　　　　　that are not usable.  This includes signatures that were issued by keys that  are  not<br>
+　　　　　　　　　present  on  the  keyring.  This  option is the same as running the --edit-key command<br>
+　　　　　　　　　"clean" after import. Defaults to no.<br>
+<br>
+　　　　　　self-sigs-only<br>
+　　　　　　　　　Accept only self-signatures while importing a  key.   All  other  key  signatures  are<br>
+　　　　　　　　　skipped  at  an early import stage.  This option can be used with keyserver-options to<br>
+　　　　　　　　　mitigate attempts to flood a key with bogus signatures from a keyserver.  The drawback<br>
+　　　　　　　　　is  that  all other valid key signatures, as required by the Web of Trust are also not<br>
+　　　　　　　　　imported.  Note that when using this option along with import-clean it suppresses  the<br>
+　　　　　　　　　final clean step after merging the imported key into the existing key.<br>
+<br>
+　　　　　　repair-keys<br>
+　　　　　　　　　After  import,  fix various problems with the keys.  For example, this reorders signa‐<br>
+　　　　　　　　　tures, and strips duplicate signatures.  Defaults to yes.<br>
+<br>
+　　　　　　import-minimal<br>
+　　　　　　　　　Import the smallest key possible. This removes all signatures except the  most  recent<br>
+　　　　　　　　　self-signature on each user ID. This option is the same as running the --edit-key com‐<br>
+　　　　　　　　　mand "minimize" after import.  Defaults to no.<br>
+<br>
+　　　　　　restore<br>
+　　　　　　import-restore<br>
+　　　　　　　　　Import in key restore mode.  This imports all data which is usually skipped during im‐<br>
+　　　　　　　　　port; including all GnuPG specific data.  All other contradicting options are overrid‐<br>
+　　　　　　　　　den.<br>
+<br>
+　　　--import-filter {name=expr}<br>
+　　　--export-filter {name=expr}<br>
+　　　　　　These options define an import/export filter which are applied to the imported/exported  key‐<br>
+　　　　　　block  right  before it will be stored/written.  name defines the type of filter to use, expr<br>
+　　　　　　the expression to evaluate.  The option can be used several times which then appends more ex‐<br>
+　　　　　　pression to the same name.<br>
+<br>
+　　　　　　The available filter types are:<br>
+<br>
+　　　　　　keep-uid<br>
+　　　　　　　　　This  filter  will  keep a user id packet and its dependent packets in the keyblock if<br>
+　　　　　　　　　the expression evaluates to true.<br>
+<br>
+　　　　　　drop-subkey<br>
+　　　　　　　　　This filter drops the selected subkeys.  Currently only implemented for  --export-fil‐<br>
+　　　　　　　　　ter.<br>
+<br>
+　　　　　　drop-sig<br>
+　　　　　　　　　This  filter  drops  the selected key signatures on user ids.  Self-signatures are not<br>
+　　　　　　　　　considered.  Currently only implemented for --import-filter.<br>
+<br>
+　　　For the syntax of the expression see the chapter "FILTER EXPRESSIONS".  The property names  for  the<br>
+　　　expressions depend on the actual filter type and are indicated in the following table.<br>
+<br>
+　　　The available properties are:<br>
+<br>
+　　　　　　uid    A string with the user id.  (keep-uid)<br>
+<br>
+　　　　　　mbox   The addr-spec part of a user id with mailbox or the empty string.  (keep-uid)<br>
+<br>
+　　　　　　key_algo<br>
+　　　　　　　　　A number with the public key algorithm of a key or subkey packet.  (drop-subkey)<br>
+<br>
+　　　　　　key_created<br>
+　　　　　　key_created_d<br>
+　　　　　　　　　The  first  is the timestamp a public key or subkey packet was created.  The second is<br>
+　　　　　　　　　the same but given as an ISO string, e.g. "2016-08-17". (drop-subkey)<br>
+<br>
+　　　　　　fpr    The hexified fingerprint of the current subkey or primary key.  (drop-subkey)<br>
+<br>
+　　　　　　primary<br>
+　　　　　　　　　Boolean indicating whether the user id is the primary one.  (keep-uid)<br>
+<br>
+　　　　　　expired<br>
+　　　　　　　　　Boolean indicating whether a user id (keep-uid), a key (drop-subkey), or  a  signature<br>
+　　　　　　　　　(drop-sig) expired.<br>
+<br>
+　　　　　　revoked<br>
+　　　　　　　　　Boolean  indicating  whether  a user id (keep-uid) or a key (drop-subkey) has been re‐<br>
+　　　　　　　　　voked.<br>
+<br>
+　　　　　　disabled<br>
+　　　　　　　　　Boolean indicating whether a primary key is disabled. (not used)<br>
+<br>
+　　　　　　secret Boolean indicating whether a key or subkey is a secret one.  (drop-subkey)<br>
+<br>
+　　　　　　usage  A string indicating the usage flags for the subkey, from the sequence ``ecsa?''.   For<br>
+　　　　　　　　　example,  a  subkey capable of just signing and authentication would be an exact match<br>
+　　　　　　　　　for ``sa''. (drop-subkey)<br>
+<br>
+　　　　　　sig_created<br>
+　　　　　　sig_created_d<br>
+　　　　　　　　　The first is the timestamp a signature packet was created.  The second is the same but<br>
+　　　　　　　　　given as an ISO date string, e.g. "2016-08-17". (drop-sig)<br>
+<br>
+　　　　　　sig_algo<br>
+　　　　　　　　　A number with the public key algorithm of a signature packet. (drop-sig)<br>
+<br>
+　　　　　　sig_digest_algo<br>
+　　　　　　　　　A number with the digest algorithm of a signature packet. (drop-sig)<br>
+<br>
+　　　--export-options parameters<br>
+　　　　　　This is a space or comma delimited string that gives options for exporting keys.  Options can<br>
+　　　　　　be prepended with a `no-' to give the opposite meaning.  The options are:<br>
+<br>
+　　　　　　export-local-sigs<br>
+　　　　　　　　　Allow exporting key signatures marked as "local". This is not generally useful  unless<br>
+　　　　　　　　　a shared keyring scheme is being used.  Defaults to no.<br>
+<br>
+　　　　　　export-attributes<br>
+　　　　　　　　　Include  attribute  user IDs (photo IDs) while exporting. Not including attribute user<br>
+　　　　　　　　　IDs is useful to export keys that are going to be used by an OpenPGP program that does<br>
+　　　　　　　　　not accept attribute user IDs.  Defaults to yes.<br>
+<br>
+　　　　　　export-sensitive-revkeys<br>
+　　　　　　　　　Include designated revoker information that was marked as "sensitive". Defaults to no.<br>
+<br>
+　　　　　　backup<br>
+　　　　　　export-backup<br>
+　　　　　　　　　Export  for  use  as a backup.  The exported data includes all data which is needed to<br>
+　　　　　　　　　restore the key or keys later with GnuPG.  The format is basically the OpenPGP  format<br>
+　　　　　　　　　but  enhanced  with GnuPG specific data.  All other contradicting options are overrid‐<br>
+　　　　　　　　　den.<br>
+<br>
+　　　　　　export-clean<br>
+　　　　　　　　　Compact (remove all signatures from) user IDs on the key being exported  if  the  user<br>
+　　　　　　　　　IDs  are  not usable. Also, do not export any signatures that are not usable. This in‐<br>
+　　　　　　　　　cludes signatures that were issued by keys that are not present on the  keyring.  This<br>
+　　　　　　　　　option is the same as running the --edit-key command "clean" before export except that<br>
+　　　　　　　　　the local copy of the key is not modified. Defaults to no.<br>
+<br>
+　　　　　　export-minimal<br>
+　　　　　　　　　Export the smallest key possible. This removes all signatures except the  most  recent<br>
+　　　　　　　　　self-signature on each user ID. This option is the same as running the --edit-key com‐<br>
+　　　　　　　　　mand "minimize" before export except that the local copy of the key is  not  modified.<br>
+　　　　　　　　　Defaults to no.<br>
+<br>
+　　　　　　export-pka<br>
+　　　　　　　　　Instead  of  outputting  the  key material output PKA records suitable to put into DNS<br>
+　　　　　　　　　zone files.  An ORIGIN line is printed before  each  record  to  allow  diverting  the<br>
+　　　　　　　　　records to the corresponding zone file.<br>
+<br>
+　　　　　　export-dane<br>
+　　　　　　　　　Instead  of  outputting  the  key material output OpenPGP DANE records suitable to put<br>
+　　　　　　　　　into DNS zone files.  An ORIGIN line is printed before each record to allow  diverting<br>
+　　　　　　　　　the records to the corresponding zone file.<br>
+<br>
+　　　--with-colons<br>
+　　　　　　Print key listings delimited by colons. Note that the output will be encoded in UTF-8 regard‐<br>
+　　　　　　less of any --display-charset setting. This format  is  useful  when  GnuPG  is  called  from<br>
+　　　　　　scripts  and  other  programs  as it is easily machine parsed. The details of this format are<br>
+　　　　　　documented in the file ‘doc/DETAILS’, which is included in the GnuPG source distribution.<br>
+<br>
+　　　--fixed-list-mode<br>
+　　　　　　Do not merge primary user ID and primary key in --with-colon listing mode and print all time‐<br>
+　　　　　　stamps  as  seconds  since 1970-01-01.  Since GnuPG 2.0.10, this mode is always used and thus<br>
+　　　　　　this option is obsolete; it does not harm to use it though.<br>
+<br>
+　　　--legacy-list-mode<br>
+　　　　　　Revert to the pre-2.1 public key list mode.  This only affects the human readable output  and<br>
+　　　　　　not  the machine interface (i.e. --with-colons).  Note that the legacy format does not convey<br>
+　　　　　　suitable information for elliptic curves.<br>
+<br>
+　　　--with-fingerprint<br>
+　　　　　　Same as the command --fingerprint but changes only the format of the output and may  be  used<br>
+　　　　　　together with another command.<br>
+<br>
+　　　--with-subkey-fingerprint<br>
+　　　　　　If  a  fingerprint is printed for the primary key, this option forces printing of the finger‐<br>
+　　　　　　print for all subkeys.  This could also be achieved by using the --with-fingerprint twice but<br>
+　　　　　　by using this option along with keyid-format "none" a compact fingerprint is printed.<br>
+<br>
+　　　--with-icao-spelling<br>
+　　　　　　Print the ICAO spelling of the fingerprint in addition to the hex digits.<br>
+<br>
+　　　--with-keygrip<br>
+　　　　　　Include the keygrip in the key listings.  In --with-colons mode this is implicitly enable for<br>
+　　　　　　secret keys.<br>
+<br>
+　　　--with-key-origin<br>
+　　　　　　Include the locally held information on the origin and last update of a key in a key listing.<br>
+　　　　　　In  --with-colons mode this is always printed.  This data is currently experimental and shall<br>
+　　　　　　not be considered part of the stable API.<br>
+<br>
+　　　--with-wkd-hash<br>
+　　　　　　Print a Web Key Directory identifier along with each user ID in key listings.  This is an ex‐<br>
+　　　　　　perimental feature and semantics may change.<br>
+<br>
+　　　--with-secret<br>
+　　　　　　Include  info  about  the  presence  of a secret key in public key listings done with --with-<br>
+　　　　　　colons.<br>
+<br>
+   OpenPGP protocol specific options<br>
+<br>
+　　　-t, --textmode<br>
+　　　--no-textmode<br>
+　　　　　　Treat input files as text and store them in the OpenPGP canonical  text  form  with  standard<br>
+　　　　　　"CRLF"  line endings. This also sets the necessary flags to inform the recipient that the en‐<br>
+　　　　　　crypted or signed data is text and may need its line endings converted back to  whatever  the<br>
+　　　　　　local  system  uses. This option is useful when communicating between two platforms that have<br>
+　　　　　　different line ending conventions (UNIX-like to Mac, Mac to Windows, etc). --no-textmode dis‐<br>
+　　　　　　ables this option, and is the default.<br>
+<br>
+　　　--force-v3-sigs<br>
+　　　--no-force-v3-sigs<br>
+<br>
+　　　--force-v4-certs<br>
+　　　--no-force-v4-certs<br>
+　　　　　　These options are obsolete and have no effect since GnuPG 2.1.<br>
+<br>
+　　　--force-mdc<br>
+　　　--disable-mdc<br>
+　　　　　　These  options  are  obsolete  and have no effect since GnuPG 2.2.8.  The MDC is always used.<br>
+　　　　　　But note: If the creation of a legacy non-MDC message is exceptionally required,  the  option<br>
+　　　　　　--rfc2440 allows for this.<br>
+<br>
+　　　--disable-signer-uid<br>
+　　　　　　By  default the user ID of the signing key is embedded in the data signature.  As of now this<br>
+　　　　　　is only done if the signing key has been specified with local-user using a mail  address,  or<br>
+　　　　　　with  sender.   This  information  can  be helpful for verifier to locate the key; see option<br>
+　　　　　　--auto-key-retrieve.<br>
+<br>
+　　　--include-key-block<br>
+　　　　　　This option is used to embed the actual signing key into a data signature.  The embedded  key<br>
+　　　　　　is  stripped down to a single user id and includes only the signing subkey used to create the<br>
+　　　　　　signature as well as as valid encryption subkeys.  All other info is removed from the key  to<br>
+　　　　　　keep  it  and  thus the signature small.  This option is the OpenPGP counterpart to the gpgsm<br>
+　　　　　　option --include-certs.<br>
+<br>
+　　　--personal-cipher-preferences string<br>
+　　　　　　Set the list of personal cipher preferences to string.  Use gpg --version to get  a  list  of<br>
+　　　　　　available  algorithms,  and  use  none  to set no preference at all.  This allows the user to<br>
+　　　　　　safely override the algorithm chosen by the recipient key preferences, as GPG will  only  se‐<br>
+　　　　　　lect  an  algorithm  that is usable by all recipients.  The most highly ranked cipher in this<br>
+　　　　　　list is also used for the --symmetric encryption command.<br>
+<br>
+　　　--personal-digest-preferences string<br>
+　　　　　　Set the list of personal digest preferences to string.  Use gpg --version to get  a  list  of<br>
+　　　　　　available  algorithms,  and  use  none  to set no preference at all.  This allows the user to<br>
+　　　　　　safely override the algorithm chosen by the recipient key preferences, as GPG will  only  se‐<br>
+　　　　　　lect  an algorithm that is usable by all recipients.  The most highly ranked digest algorithm<br>
+　　　　　　in this list is also used when signing without encryption (e.g. --clear-sign or --sign).<br>
+<br>
+　　　--personal-compress-preferences string<br>
+　　　　　　Set the list of personal compression preferences to string.  Use gpg --version to get a  list<br>
+　　　　　　of  available  algorithms, and use none to set no preference at all.  This allows the user to<br>
+　　　　　　safely override the algorithm chosen by the recipient key preferences, as GPG will  only  se‐<br>
+　　　　　　lect an algorithm that is usable by all recipients.  The most highly ranked compression algo‐<br>
+　　　　　　rithm in this list is also used when there are no recipient keys to consider (e.g.  --symmet‐<br>
+　　　　　　ric).<br>
+<br>
+　　　--s2k-cipher-algo name<br>
+　　　　　　Use name as the cipher algorithm for symmetric encryption with a passphrase if --personal-ci‐<br>
+　　　　　　pher-preferences and --cipher-algo are not given.  The default is AES-128.<br>
+<br>
+　　　--s2k-digest-algo name<br>
+　　　　　　Use name as the digest algorithm used to mangle the  passphrases  for  symmetric  encryption.<br>
+　　　　　　The default is SHA-1.<br>
+<br>
+　　　--s2k-mode n<br>
+　　　　　　Selects  how  passphrases  for symmetric encryption are mangled. If n is 0 a plain passphrase<br>
+　　　　　　(which is in general not recommended) will be used, a 1 adds a  salt  (which  should  not  be<br>
+　　　　　　used)  to  the  passphrase and a 3 (the default) iterates the whole process a number of times<br>
+　　　　　　(see --s2k-count).<br>
+<br>
+　　　--s2k-count n<br>
+　　　　　　Specify how many times the passphrases mangling for symmetric encryption is  repeated.   This<br>
+　　　　　　value may range between 1024 and 65011712 inclusive.  The default is inquired from gpg-agent.<br>
+　　　　　　Note that not all values in the 1024-65011712 range are legal and if an illegal value is  se‐<br>
+　　　　　　lected,  GnuPG  will  round up to the nearest legal value.  This option is only meaningful if<br>
+　　　　　　--s2k-mode is set to the default of 3.<br>
+<br>
+   Compliance options<br>
+<br>
+　　　These options control what GnuPG is compliant to. Only one of these options may be active at a time.<br>
+　　　Note  that  the  default  setting of this is nearly always the correct one. See the INTEROPERABILITY<br>
+　　　WITH OTHER OPENPGP PROGRAMS section below before using one of these options.<br>
+<br>
+　　　--gnupg<br>
+　　　　　　Use standard GnuPG behavior. This is essentially OpenPGP behavior (see --openpgp),  but  with<br>
+　　　　　　some  additional  workarounds for common compatibility problems in different versions of PGP.<br>
+　　　　　　This is the default option, so it is not generally needed, but it may be useful to override a<br>
+　　　　　　different compliance option in the gpg.conf file.<br>
+<br>
+　　　--openpgp<br>
+　　　　　　Reset  all  packet,  cipher and digest options to strict OpenPGP behavior. Use this option to<br>
+　　　　　　reset all previous options like --s2k-*, --cipher-algo, --digest-algo and --compress-algo  to<br>
+　　　　　　OpenPGP compliant values. All PGP workarounds are disabled.<br>
+<br>
+　　　--rfc4880<br>
+　　　　　　Reset  all  packet,  cipher and digest options to strict RFC-4880 behavior. Note that this is<br>
+　　　　　　currently the same thing as --openpgp.<br>
+<br>
+　　　--rfc4880bis<br>
+　　　　　　Enable experimental features from proposed updates to RFC-4880.  This option can be  used  in<br>
+　　　　　　addition  to  the  other compliance options.  Warning: The behavior may change with any GnuPG<br>
+　　　　　　release and created keys or data may not be usable with future GnuPG versions.<br>
+<br>
+　　　--rfc2440<br>
+　　　　　　Reset all packet, cipher and digest options to strict RFC-2440 behavior.  Note that by  using<br>
+　　　　　　this  option encryption packets are created in a legacy mode without MDC protection.  This is<br>
+　　　　　　dangerous and should thus only be used for experiments.  See also option --ignore-mdc-error.<br>
+<br>
+　　　--pgp6 Set up all options to be as PGP 6 compliant as possible. This restricts you  to  the  ciphers<br>
+　　　　　　IDEA  (if the IDEA plugin is installed), 3DES, and CAST5, the hashes MD5, SHA1 and RIPEMD160,<br>
+　　　　　　and the compression algorithms none and ZIP. This also disables  --throw-keyids,  and  making<br>
+　　　　　　signatures  with signing subkeys as PGP 6 does not understand signatures made by signing sub‐<br>
+　　　　　　keys.<br>
+<br>
+　　　　　　This option implies --escape-from-lines.<br>
+<br>
+　　　--pgp7 Set up all options to be as PGP 7 compliant as possible. This is identical to  --pgp6  except<br>
+　　　　　　that  MDCs  are  not  disabled,  and the list of allowable ciphers is expanded to add AES128,<br>
+　　　　　　AES192, AES256, and TWOFISH.<br>
+<br>
+　　　--pgp8 Set up all options to be as PGP 8 compliant as possible. PGP 8 is a lot closer to the OpenPGP<br>
+　　　　　　standard  than  previous  versions of PGP, so all this does is disable --throw-keyids and set<br>
+　　　　　　--escape-from-lines.  All algorithms are allowed except for the SHA224,  SHA384,  and  SHA512<br>
+　　　　　　digests.<br>
+<br>
+　　　--compliance string<br>
+　　　　　　This option can be used instead of one of the options above.  Valid values for string are the<br>
+　　　　　　above option names (without the double dash) and possibly others as shown when  using  "help"<br>
+　　　　　　for value.<br>
+<br>
+   Doing things one usually doesn't want to do<br>
+<br>
+　　　-n<br>
+　　　--dry-run<br>
+　　　　　　Don't make any changes (this is not completely implemented).<br>
+<br>
+　　　--list-only<br>
+　　　　　　Changes  the  behaviour of some commands. This is like --dry-run but different in some cases.<br>
+　　　　　　The semantic of this option may be extended in the future. Currently it only skips the actual<br>
+　　　　　　decryption pass and therefore enables a fast listing of the encryption keys.<br>
+<br>
+　　　-i<br>
+　　　--interactive<br>
+　　　　　　Prompt before overwriting any files.<br>
+<br>
+　　　--debug-level level<br>
+　　　　　　Select  the debug level for investigating problems. level may be a numeric value or by a key‐<br>
+　　　　　　word:<br>
+<br>
+　　　　　　none   No debugging at all.  A value of less than 1 may be used instead of the keyword.<br>
+<br>
+　　　　　　basic  Some basic debug messages.  A value between 1 and 2 may be used instead  of  the  key‐<br>
+　　　　　　　　　word.<br>
+<br>
+　　　　　　advanced<br>
+　　　　　　　　　More  verbose debug messages.  A value between 3 and 5 may be used instead of the key‐<br>
+　　　　　　　　　word.<br>
+<br>
+　　　　　　expert Even more detailed messages.  A value between 6 and 8 may be used instead of the  key‐<br>
+　　　　　　　　　word.<br>
+<br>
+　　　　　　guru   All  of  the debug messages you can get. A value greater than 8 may be used instead of<br>
+　　　　　　　　　the keyword.  The creation of hash tracing files is only enabled  if  the  keyword  is<br>
+　　　　　　　　　used.<br>
+<br>
+　　　How  these  messages  are  mapped to the actual debugging flags is not specified and may change with<br>
+　　　newer releases of this program. They are however carefully selected to best aid in debugging.<br>
+<br>
+　　　--debug flags<br>
+　　　　　　Set debugging flags. All flags are or-ed and flags may be given in C syntax (e.g. 0x0042)  or<br>
+　　　　　　as  a  comma  separated  list of flag names.  To get a list of all supported flags the single<br>
+　　　　　　word "help" can be used.<br>
+<br>
+　　　--debug-all<br>
+　　　　　　Set all useful debugging flags.<br>
+<br>
+　　　--debug-iolbf<br>
+　　　　　　Set stdout into line buffered mode.  This option is only honored when given  on  the  command<br>
+　　　　　　line.<br>
+<br>
+　　　--faked-system-time epoch<br>
+　　　　　　This  option is only useful for testing; it sets the system time back or forth to epoch which<br>
+　　　　　　is the number of seconds elapsed since the year 1970.  Alternatively epoch may be given as  a<br>
+　　　　　　full ISO time string (e.g. "20070924T154812").<br>
+<br>
+　　　　　　If you suffix epoch with an exclamation mark (!), the system time will appear to be frozen at<br>
+　　　　　　the specified time.<br>
+<br>
+　　　--enable-progress-filter<br>
+　　　　　　Enable certain PROGRESS status outputs. This option allows frontends to  display  a  progress<br>
+　　　　　　indicator while gpg is processing larger files.  There is a slight performance overhead using<br>
+　　　　　　it.<br>
+<br>
+　　　--status-fd n<br>
+　　　　　　Write special status strings to the file descriptor n.  See the file DETAILS in the  documen‐<br>
+　　　　　　tation for a listing of them.<br>
+<br>
+　　　--status-file file<br>
+　　　　　　Same as --status-fd, except the status data is written to file file.<br>
+<br>
+　　　--logger-fd n<br>
+　　　　　　Write log output to file descriptor n and not to STDERR.<br>
+<br>
+　　　--log-file file<br>
+　　　--logger-file file<br>
+　　　　　　Same  as --logger-fd, except the logger data is written to file file.  Use ‘socket://’ to log<br>
+　　　　　　to a socket.  Note that in this version of gpg the option has only an effect  if  --batch  is<br>
+　　　　　　also used.<br>
+<br>
+　　　--attribute-fd n<br>
+　　　　　　Write  attribute subpackets to the file descriptor n. This is most useful for use with --sta‐<br>
+　　　　　　tus-fd, since the status messages are needed to separate out the various subpackets from  the<br>
+　　　　　　stream delivered to the file descriptor.<br>
+<br>
+　　　--attribute-file file<br>
+　　　　　　Same as --attribute-fd, except the attribute data is written to file file.<br>
+<br>
+　　　--comment string<br>
+　　　--no-comments<br>
+　　　　　　Use  string  as  a  comment string in cleartext signatures and ASCII armored messages or keys<br>
+　　　　　　(see --armor). The default behavior is not to use a comment string. --comment may be repeated<br>
+　　　　　　multiple  times to get multiple comment strings. --no-comments removes all comments.  It is a<br>
+　　　　　　good idea to keep the length of a single comment below 60 characters to avoid  problems  with<br>
+　　　　　　mail programs wrapping such lines.  Note that comment lines, like all other header lines, are<br>
+　　　　　　not protected by the signature.<br>
+<br>
+　　　--emit-version<br>
+　　　--no-emit-version<br>
+　　　　　　Force inclusion of the version string in ASCII armored output.  If given once only  the  name<br>
+　　　　　　of  the program and the major number is emitted, given twice the minor is also emitted, given<br>
+　　　　　　thrice the micro is added, and given four times an operating system  identification  is  also<br>
+　　　　　　emitted.  --no-emit-version (default) disables the version line.<br>
+<br>
+　　　--sig-notation {name=value}<br>
+　　　--cert-notation {name=value}<br>
+　　　-N, --set-notation {name=value}<br>
+　　　　　　Put  the  name  value  pair  into  the signature as notation data.  name must consist only of<br>
+　　　　　　printable characters or spaces, and must contain a '@'  character  in  the  form  keyname@do‐<br>
+　　　　　　main.example.com  (substituting the appropriate keyname and domain name, of course).  This is<br>
+　　　　　　to help prevent pollution of the IETF reserved notation namespace. The  --expert  flag  over‐<br>
+　　　　　　rides  the  '@' check. value may be any printable string; it will be encoded in UTF-8, so you<br>
+　　　　　　should check that your --display-charset is set correctly. If you prefix name with an  excla‐<br>
+　　　　　　mation  mark (!), the notation data will be flagged as critical (rfc4880:5.2.3.16). --sig-no‐<br>
+　　　　　　tation sets a notation for data signatures. --cert-notation sets a notation  for  key  signa‐<br>
+　　　　　　tures (certifications). --set-notation sets both.<br>
+<br>
+　　　　　　There  are  special  codes that may be used in notation names. "%k" will be expanded into the<br>
+　　　　　　key ID of the key being signed, "%K" into the long key ID of the key being signed, "%f"  into<br>
+　　　　　　the  fingerprint  of  the key being signed, "%s" into the key ID of the key making the signa‐<br>
+　　　　　　ture, "%S" into the long key ID of the key making the signature, "%g" into the fingerprint of<br>
+　　　　　　the key making the signature (which might be a subkey), "%p" into the fingerprint of the pri‐<br>
+　　　　　　mary key of the key making the signature, "%c" into the  signature  count  from  the  OpenPGP<br>
+　　　　　　smartcard, and "%%" results in a single "%". %k, %K, and %f are only meaningful when making a<br>
+　　　　　　key signature (certification), and %c is only meaningful when using the OpenPGP smartcard.<br>
+<br>
+　　　--known-notation name<br>
+　　　　　　Adds name to a list of known critical signature notations.  The effect of this  is  that  gpg<br>
+　　　　　　will  not mark a signature with a critical signature notation of that name as bad.  Note that<br>
+　　　　　　gpg already knows by default about a few critical signatures notation names.<br>
+<br>
+　　　--sig-policy-url string<br>
+　　　--cert-policy-url string<br>
+　　　--set-policy-url string<br>
+　　　　　　Use string as a Policy URL for signatures (rfc4880:5.2.3.20).  If you prefix it with  an  ex‐<br>
+　　　　　　clamation  mark (!), the policy URL packet will be flagged as critical. --sig-policy-url sets<br>
+　　　　　　a policy url for data signatures. --cert-policy-url sets a  policy  url  for  key  signatures<br>
+　　　　　　(certifications). --set-policy-url sets both.<br>
+<br>
+　　　　　　The same %-expandos used for notation data are available here as well.<br>
+<br>
+　　　--sig-keyserver-url string<br>
+　　　　　　Use  string as a preferred keyserver URL for data signatures. If you prefix it with an excla‐<br>
+　　　　　　mation mark (!), the keyserver URL packet will be flagged as critical.<br>
+<br>
+　　　　　　The same %-expandos used for notation data are available here as well.<br>
+<br>
+　　　--set-filename string<br>
+　　　　　　Use string as the filename which is stored inside  messages.   This  overrides  the  default,<br>
+　　　　　　which  is to use the actual filename of the file being encrypted.  Using the empty string for<br>
+　　　　　　string effectively removes the filename from the output.<br>
+<br>
+　　　--for-your-eyes-only<br>
+　　　--no-for-your-eyes-only<br>
+　　　　　　Set the `for your eyes only' flag in the message. This causes GnuPG to  refuse  to  save  the<br>
+　　　　　　file  unless  the  --output  option is given, and PGP to use a "secure viewer" with a claimed<br>
+　　　　　　Tempest-resistant font to display the message. This option overrides  --set-filename.   --no-<br>
+　　　　　　for-your-eyes-only disables this option.<br>
+<br>
+　　　--use-embedded-filename<br>
+　　　--no-use-embedded-filename<br>
+　　　　　　Try  to  create a file with a name as embedded in the data. This can be a dangerous option as<br>
+　　　　　　it enables overwriting files.  Defaults to no.  Note that the option --output overrides  this<br>
+　　　　　　option.<br>
+<br>
+　　　--cipher-algo name<br>
+　　　　　　Use name as cipher algorithm. Running the program with the command --version yields a list of<br>
+　　　　　　supported algorithms. If this is not used the cipher algorithm is selected from  the  prefer‐<br>
+　　　　　　ences stored with the key. In general, you do not want to use this option as it allows you to<br>
+　　　　　　violate the OpenPGP standard.  --personal-cipher-preferences is the safe  way  to  accomplish<br>
+　　　　　　the same thing.<br>
+<br>
+　　　--digest-algo name<br>
+　　　　　　Use  name  as  the  message  digest algorithm. Running the program with the command --version<br>
+　　　　　　yields a list of supported algorithms. In general, you do not want to use this option  as  it<br>
+　　　　　　allows  you to violate the OpenPGP standard. --personal-digest-preferences is the safe way to<br>
+　　　　　　accomplish the same thing.<br>
+<br>
+　　　--compress-algo name<br>
+　　　　　　Use compression algorithm name. "zlib" is RFC-1950 ZLIB compression. "zip"  is  RFC-1951  ZIP<br>
+　　　　　　compression  which is used by PGP.  "bzip2" is a more modern compression scheme that can com‐<br>
+　　　　　　press some things better than zip or zlib, but at the cost of more memory  used  during  com‐<br>
+　　　　　　pression  and decompression. "uncompressed" or "none" disables compression. If this option is<br>
+　　　　　　not used, the default behavior is to examine the recipient key preferences to see which algo‐<br>
+　　　　　　rithms the recipient supports. If all else fails, ZIP is used for maximum compatibility.<br>
+<br>
+　　　　　　ZLIB may give better compression results than ZIP, as the compression window size is not lim‐<br>
+　　　　　　ited to 8k. BZIP2 may give even better compression results than that, but will use a signifi‐<br>
+　　　　　　cantly  larger  amount of memory while compressing and decompressing. This may be significant<br>
+　　　　　　in low memory situations. Note, however, that PGP (all versions) only supports  ZIP  compres‐<br>
+　　　　　　sion. Using any algorithm other than ZIP or "none" will make the message unreadable with PGP.<br>
+　　　　　　In general, you do not want to use this option as it allows you to violate the OpenPGP  stan‐<br>
+　　　　　　dard. --personal-compress-preferences is the safe way to accomplish the same thing.<br>
+<br>
+　　　--cert-digest-algo name<br>
+　　　　　　Use  name  as  the message digest algorithm used when signing a key. Running the program with<br>
+　　　　　　the command --version yields a list of supported algorithms. Be aware that if you  choose  an<br>
+　　　　　　algorithm  that GnuPG supports but other OpenPGP implementations do not, then some users will<br>
+　　　　　　not be able to use the key signatures you make, or quite possibly your entire key.<br>
+<br>
+　　　--disable-cipher-algo name<br>
+　　　　　　Never allow the use of name as cipher algorithm.  The given name will not be checked so  that<br>
+　　　　　　a later loaded algorithm will still get disabled.<br>
+<br>
+　　　--disable-pubkey-algo name<br>
+　　　　　　Never  allow  the use of name as public key algorithm.  The given name will not be checked so<br>
+　　　　　　that a later loaded algorithm will still get disabled.<br>
+<br>
+　　　--throw-keyids<br>
+　　　--no-throw-keyids<br>
+　　　　　　Do not put the recipient key IDs into encrypted messages. This helps to hide the receivers of<br>
+　　　　　　the message and is a limited countermeasure against traffic analysis. ([Using a little social<br>
+　　　　　　engineering anyone who is able to decrypt the message can check whether one of the other  re‐<br>
+　　　　　　cipients  is  the  one he suspects.])  On the receiving side, it may slow down the decryption<br>
+　　　　　　process because all available secret keys must be tried.  --no-throw-keyids disables this op‐<br>
+　　　　　　tion. This option is essentially the same as using --hidden-recipient for all recipients.<br>
+<br>
+　　　--not-dash-escaped<br>
+　　　　　　This  option  changes the behavior of cleartext signatures so that they can be used for patch<br>
+　　　　　　files. You should not send such an armored file via email because all spaces and line endings<br>
+　　　　　　are hashed too. You can not use this option for data which has 5 dashes at the beginning of a<br>
+　　　　　　line, patch files don't have this. A special armor header line tells GnuPG about this cleart‐<br>
+　　　　　　ext signature option.<br>
+<br>
+　　　--escape-from-lines<br>
+　　　--no-escape-from-lines<br>
+　　　　　　Because some mailers change lines starting with "From " to ">From " it is good to handle such<br>
+　　　　　　lines in a special way when creating cleartext signatures to prevent  the  mail  system  from<br>
+　　　　　　breaking  the signature. Note that all other PGP versions do it this way too.  Enabled by de‐<br>
+　　　　　　fault. --no-escape-from-lines disables this option.<br>
+<br>
+　　　--passphrase-repeat n<br>
+　　　　　　Specify how many times gpg will request a new passphrase be repeated.   This  is  useful  for<br>
+　　　　　　helping  memorize  a  passphrase.   Defaults  to 1 repetition; can be set to 0 to disable any<br>
+　　　　　　passphrase repetition.  Note that a n greater than 1 will pop  up  the  pinentry  window  n+1<br>
+　　　　　　times even if a modern pinentry with two entry fields is used.<br>
+<br>
+　　　--passphrase-fd n<br>
+　　　　　　Read  the  passphrase  from file descriptor n. Only the first line will be read from file de‐<br>
+　　　　　　scriptor n. If you use 0 for n, the passphrase will be read from STDIN. This can only be used<br>
+　　　　　　if only one passphrase is supplied.<br>
+<br>
+　　　　　　Note  that since Version 2.0 this passphrase is only used if the option --batch has also been<br>
+　　　　　　given. Since Version 2.1 the --pinentry-mode also needs to be set to loopback.<br>
+<br>
+　　　--passphrase-file file<br>
+　　　　　　Read the passphrase from file file. Only the first line will be read from file file. This can<br>
+　　　　　　only  be used if only one passphrase is supplied. Obviously, a passphrase stored in a file is<br>
+　　　　　　of questionable security if other users can read this file. Don't use this option if you  can<br>
+　　　　　　avoid it.<br>
+<br>
+　　　　　　Note  that since Version 2.0 this passphrase is only used if the option --batch has also been<br>
+　　　　　　given. Since Version 2.1 the --pinentry-mode also needs to be set to loopback.<br>
+<br>
+　　　--passphrase string<br>
+　　　　　　Use string as the passphrase. This can only be used if only one passphrase is supplied. Obvi‐<br>
+　　　　　　ously, this is of very questionable security on a multi-user system. Don't use this option if<br>
+　　　　　　you can avoid it.<br>
+<br>
+　　　　　　Note that since Version 2.0 this passphrase is only used if the option --batch has also  been<br>
+　　　　　　given. Since Version 2.1 the --pinentry-mode also needs to be set to loopback.<br>
+<br>
+　　　--pinentry-mode mode<br>
+　　　　　　Set the pinentry mode to mode.  Allowed values for mode are:<br>
+<br>
+　　　　　　default<br>
+　　　　　　　　　Use the default of the agent, which is ask.<br>
+<br>
+　　　　　　ask    Force the use of the Pinentry.<br>
+<br>
+　　　　　　cancel Emulate use of Pinentry's cancel button.<br>
+<br>
+　　　　　　error  Return a Pinentry error (``No Pinentry'').<br>
+<br>
+　　　　　　loopback<br>
+　　　　　　　　　Redirect  Pinentry  queries to the caller.  Note that in contrast to Pinentry the user<br>
+　　　　　　　　　is not prompted again if he enters a bad password.<br>
+<br>
+　　　--no-symkey-cache<br>
+　　　　　　Disable the passphrase cache used for symmetrical en- and decryption.  This cache is based on<br>
+　　　　　　the message specific salt value (cf. --s2k-mode).<br>
+<br>
+　　　--request-origin origin<br>
+　　　　　　Tell gpg to assume that the operation ultimately originated at origin.  Depending on the ori‐<br>
+　　　　　　gin certain restrictions are applied and the Pinentry may include an extra note on  the  ori‐<br>
+　　　　　　gin.   Supported  values for origin are: local which is the default, remote to indicate a re‐<br>
+　　　　　　mote origin or browser for an operation requested by a web browser.<br>
+<br>
+　　　--command-fd n<br>
+　　　　　　This is a replacement for the deprecated shared-memory IPC mode.  If this option is  enabled,<br>
+　　　　　　user  input  on questions is not expected from the TTY but from the given file descriptor. It<br>
+　　　　　　should be used together with --status-fd. See the file doc/DETAILS in the source distribution<br>
+　　　　　　for details on how to use it.<br>
+<br>
+　　　--command-file file<br>
+　　　　　　Same as --command-fd, except the commands are read out of file file<br>
+<br>
+　　　--allow-non-selfsigned-uid<br>
+　　　--no-allow-non-selfsigned-uid<br>
+　　　　　　Allow  the import and use of keys with user IDs which are not self-signed. This is not recom‐<br>
+　　　　　　mended, as a non self-signed user ID is trivial to forge. --no-allow-non-selfsigned-uid  dis‐<br>
+　　　　　　ables.<br>
+<br>
+　　　--allow-freeform-uid<br>
+　　　　　　Disable  all checks on the form of the user ID while generating a new one. This option should<br>
+　　　　　　only be used in very special environments as it does not ensure the de-facto standard  format<br>
+　　　　　　of user IDs.<br>
+<br>
+　　　--ignore-time-conflict<br>
+　　　　　　GnuPG  normally checks that the timestamps associated with keys and signatures have plausible<br>
+　　　　　　values. However, sometimes a signature seems to be older than the key due to clock  problems.<br>
+　　　　　　This option makes these checks just a warning. See also --ignore-valid-from for timestamp is‐<br>
+　　　　　　sues on subkeys.<br>
+<br>
+　　　--ignore-valid-from<br>
+　　　　　　GnuPG normally does not select and use subkeys created in the future.  This option allows the<br>
+　　　　　　use  of  such  keys and thus exhibits the pre-1.0.7 behaviour. You should not use this option<br>
+　　　　　　unless there is some clock problem. See also --ignore-time-conflict for timestamp issues with<br>
+　　　　　　signatures.<br>
+<br>
+　　　--ignore-crc-error<br>
+　　　　　　The  ASCII  armor used by OpenPGP is protected by a CRC checksum against transmission errors.<br>
+　　　　　　Occasionally the CRC gets mangled somewhere on the transmission channel but the  actual  con‐<br>
+　　　　　　tent  (which  is  protected by the OpenPGP protocol anyway) is still okay. This option allows<br>
+　　　　　　GnuPG to ignore CRC errors.<br>
+<br>
+　　　--ignore-mdc-error<br>
+　　　　　　This option changes a MDC integrity protection failure into a warning.  It is required to de‐<br>
+　　　　　　crypt old messages which did not use an MDC.  It may also be useful if a message is partially<br>
+　　　　　　garbled, but it is necessary to get as much data as possible out of that garbled message.  Be<br>
+　　　　　　aware  that  a  missing or failed MDC can be an indication of an attack.  Use with great cau‐<br>
+　　　　　　tion; see also option --rfc2440.<br>
+<br>
+　　　--allow-weak-digest-algos<br>
+　　　　　　Signatures made with known-weak digest algorithms are normally rejected with an ``invalid di‐<br>
+　　　　　　gest  algorithm''  message.  This option allows the verification of signatures made with such<br>
+　　　　　　weak algorithms.  MD5 is the only digest algorithm considered  weak  by  default.   See  also<br>
+　　　　　　--weak-digest to reject other digest algorithms.<br>
+<br>
+　　　--weak-digest name<br>
+　　　　　　Treat  the  specified digest algorithm as weak.  Signatures made over weak digests algorithms<br>
+　　　　　　are normally rejected. This option can be supplied  multiple  times  if  multiple  algorithms<br>
+　　　　　　should  be  considered weak.  See also --allow-weak-digest-algos to disable rejection of weak<br>
+　　　　　　digests.  MD5 is always considered weak, and does not need to be listed explicitly.<br>
+<br>
+　　　--allow-weak-key-signatures<br>
+　　　　　　To avoid a minor risk of collision attacks on third-party key signatures  made  using  SHA-1,<br>
+　　　　　　those  key  signatures are considered invalid.  This options allows to override this restric‐<br>
+　　　　　　tion.<br>
+<br>
+　　　--no-default-keyring<br>
+　　　　　　Do not add the default keyrings to the list of keyrings. Note that  GnuPG  will  not  operate<br>
+　　　　　　without  any  keyrings,  so  if you use this option and do not provide alternate keyrings via<br>
+　　　　　　--keyring or --secret-keyring, then GnuPG  will  still  use  the  default  public  or  secret<br>
+　　　　　　keyrings.<br>
+<br>
+　　　--no-keyring<br>
+　　　　　　Do  not  use  any  keyring  at all.  This overrides the default and all options which specify<br>
+　　　　　　keyrings.<br>
+<br>
+　　　--skip-verify<br>
+　　　　　　Skip the signature verification step. This may be used to make the decryption faster  if  the<br>
+　　　　　　signature verification is not needed.<br>
+<br>
+　　　--with-key-data<br>
+　　　　　　Print key listings delimited by colons (like --with-colons) and print the public key data.<br>
+<br>
+　　　--list-signatures<br>
+　　　--list-sigs<br>
+　　　　　　Same  as --list-keys, but the signatures are listed too.  This command has the same effect as<br>
+　　　　　　using --list-keys with --with-sig-list.  Note that in contrast to --check-signatures the  key<br>
+　　　　　　signatures are not verified.  This command can be used to create a list of signing keys miss‐<br>
+　　　　　　ing in the local keyring; for example:<br>
+<br>
+　　　　　　 gpg --list-sigs --with-colons USERID | \<br>
+　　　　　　   awk -F: '$1=="sig" && $2=="?" {if($13){print $13}else{print $5}}'<br>
+<br>
+　　　--fast-list-mode<br>
+　　　　　　Changes the output of the list commands to work faster; this  is  achieved  by  leaving  some<br>
+　　　　　　parts  empty. Some applications don't need the user ID and the trust information given in the<br>
+　　　　　　listings. By using this options they can get a faster listing. The exact  behaviour  of  this<br>
+　　　　　　option  may  change  in future versions.  If you are missing some information, don't use this<br>
+　　　　　　option.<br>
+<br>
+　　　--no-literal<br>
+　　　　　　This is not for normal use. Use the source to see for what it might be useful.<br>
+<br>
+　　　--set-filesize<br>
+　　　　　　This is not for normal use. Use the source to see for what it might be useful.<br>
+<br>
+　　　--show-session-key<br>
+　　　　　　Display the session key used for one message. See --override-session-key for the  counterpart<br>
+　　　　　　of this option.<br>
+<br>
+　　　　　　We  think  that Key Escrow is a Bad Thing; however the user should have the freedom to decide<br>
+　　　　　　whether to go to prison or to reveal the content of one specific message without compromising<br>
+　　　　　　all messages ever encrypted for one secret key.<br>
+<br>
+　　　　　　You  can  also use this option if you receive an encrypted message which is abusive or offen‐<br>
+　　　　　　sive, to prove to the administrators of the messaging system that the ciphertext  transmitted<br>
+　　　　　　corresponds to an inappropriate plaintext so they can take action against the offending user.<br>
+<br>
+　　　--override-session-key string<br>
+　　　--override-session-key-fd fd<br>
+　　　　　　Don't use the public key but the session key string respective the session key taken from the<br>
+　　　　　　first line read from file descriptor fd.  The format of this string is the same  as  the  one<br>
+　　　　　　printed by --show-session-key. This option is normally not used but comes handy in case some‐<br>
+　　　　　　one forces you to reveal the content of an encrypted message; using this option  you  can  do<br>
+　　　　　　this  without  handing out the secret key.  Note that using --override-session-key may reveal<br>
+　　　　　　the session key to all local users via the global process table.  Often it is useful to  com‐<br>
+　　　　　　bine this option with --no-keyring.<br>
+<br>
+　　　--ask-sig-expire<br>
+　　　--no-ask-sig-expire<br>
+　　　　　　When making a data signature, prompt for an expiration time. If this option is not specified,<br>
+　　　　　　the expiration time set via --default-sig-expire is used. --no-ask-sig-expire  disables  this<br>
+　　　　　　option.<br>
+<br>
+　　　--default-sig-expire<br>
+　　　　　　The  default expiration time to use for signature expiration. Valid values are "0" for no ex‐<br>
+　　　　　　piration, a number followed by the letter d (for days), w (for weeks), m (for months),  or  y<br>
+　　　　　　(for years) (for example "2m" for two months, or "5y" for five years), or an absolute date in<br>
+　　　　　　the form YYYY-MM-DD. Defaults to "0".<br>
+<br>
+　　　--ask-cert-expire<br>
+　　　--no-ask-cert-expire<br>
+　　　　　　When making a key signature, prompt for an expiration time. If this option is not  specified,<br>
+　　　　　　the expiration time set via --default-cert-expire is used. --no-ask-cert-expire disables this<br>
+　　　　　　option.<br>
+<br>
+　　　--default-cert-expire<br>
+　　　　　　The default expiration time to use for key signature expiration.  Valid values are "0" for no<br>
+　　　　　　expiration, a number followed by the letter d (for days), w (for weeks), m (for months), or y<br>
+　　　　　　(for years) (for example "2m" for two months, or "5y" for five years), or an absolute date in<br>
+　　　　　　the form YYYY-MM-DD. Defaults to "0".<br>
+<br>
+　　　--default-new-key-algo string<br>
+　　　　　　This  option  can  be used to change the default algorithms for key generation. The string is<br>
+　　　　　　similar to the arguments required for the command  --quick-add-key  but  slightly  different.<br>
+　　　　　　For  example  the  current  default of "rsa2048/cert,sign+rsa2048/encr" (or "rsa3072") can be<br>
+　　　　　　changed  to  the   value   of   what   we   currently   call   future   default,   which   is<br>
+　　　　　　"ed25519/cert,sign+cv25519/encr".   You need to consult the source code to learn the details.<br>
+　　　　　　Note that the advanced key generation commands can always be used to specify a key  algorithm<br>
+　　　　　　directly.<br>
+<br>
+　　　--allow-secret-key-import<br>
+　　　　　　This is an obsolete option and is not used anywhere.<br>
+<br>
+　　　--allow-multiple-messages<br>
+<br>
+　　　--no-allow-multiple-messages<br>
+　　　　　　Allow  processing  of  multiple  OpenPGP messages contained in a single file or stream.  Some<br>
+　　　　　　programs that call GPG are not prepared to deal with multiple messages  being  processed  to‐<br>
+　　　　　　gether,  so  this option defaults to no.  Note that versions of GPG prior to 1.4.7 always al‐<br>
+　　　　　　lowed multiple messages.  Future versions of GnUPG will remove this option.<br>
+<br>
+　　　　　　Warning: Do not use this option unless you need it as a temporary workaround!<br>
+<br>
+　　　--enable-special-filenames<br>
+　　　　　　This option enables a mode in which filenames of the form ‘-&n’, where n  is  a  non-negative<br>
+　　　　　　decimal number, refer to the file descriptor n and not to a file with that name.<br>
+<br>
+　　　--no-expensive-trust-checks<br>
+　　　　　　Experimental use only.<br>
+<br>
+　　　--preserve-permissions<br>
+　　　　　　Don't  change  the permissions of a secret keyring back to user read/write only. Use this op‐<br>
+　　　　　　tion only if you really know what you are doing.<br>
+<br>
+　　　--default-preference-list string<br>
+　　　　　　Set the list of default preferences to string. This preference list is used for new keys  and<br>
+　　　　　　becomes the default for "setpref" in the edit menu.<br>
+<br>
+　　　--default-keyserver-url name<br>
+　　　　　　Set  the default keyserver URL to name. This keyserver will be used as the keyserver URL when<br>
+　　　　　　writing a new self-signature on a key, which includes key  generation  and  changing  prefer‐<br>
+　　　　　　ences.<br>
+<br>
+　　　--list-config<br>
+　　　　　　Display  various  internal configuration parameters of GnuPG. This option is intended for ex‐<br>
+　　　　　　ternal programs that call GnuPG to perform tasks, and is thus not generally useful.  See  the<br>
+　　　　　　file  ‘doc/DETAILS’  in  the source distribution for the details of which configuration items<br>
+　　　　　　may be listed. --list-config is only usable with --with-colons set.<br>
+<br>
+　　　--list-gcrypt-config<br>
+　　　　　　Display various internal configuration parameters of Libgcrypt.<br>
+<br>
+　　　--gpgconf-list<br>
+　　　　　　This command is similar to --list-config but in general only internally used by  the  gpgconf<br>
+　　　　　　tool.<br>
+<br>
+　　　--gpgconf-test<br>
+　　　　　　This is more or less dummy action.  However it parses the configuration file and returns with<br>
+　　　　　　failure if the configuration file would prevent gpg from startup.  Thus it may be used to run<br>
+　　　　　　a syntax check on the configuration file.<br>
+<br>
+   Deprecated options<br>
+<br>
+　　　--show-photos<br>
+　　　--no-show-photos<br>
+　　　　　　Causes  --list-keys, --list-signatures, --list-public-keys, --list-secret-keys, and verifying<br>
+　　　　　　a signature to also display the photo ID attached to the  key,  if  any.  See  also  --photo-<br>
+　　　　　　viewer. These options are deprecated. Use --list-options [no-]show-photos and/or --verify-op‐<br>
+　　　　　　tions [no-]show-photos instead.<br>
+<br>
+　　　--show-keyring<br>
+　　　　　　Display the keyring name at the head of key listings to show which keyring a  given  key  re‐<br>
+　　　　　　sides on. This option is deprecated: use --list-options [no-]show-keyring instead.<br>
+<br>
+　　　--always-trust<br>
+　　　　　　Identical to --trust-model always. This option is deprecated.<br>
+<br>
+　　　--show-notation<br>
+　　　--no-show-notation<br>
+　　　　　　Show  signature  notations in the --list-signatures or --check-signatures listings as well as<br>
+　　　　　　when verifying a signature with a notation in it. These options are deprecated.  Use  --list-<br>
+　　　　　　options [no-]show-notation and/or --verify-options [no-]show-notation instead.<br>
+<br>
+　　　--show-policy-url<br>
+　　　--no-show-policy-url<br>
+　　　　　　Show policy URLs in the --list-signatures or --check-signatures listings as well as when ver‐<br>
+　　　　　　ifying a signature with a policy URL in it. These options are deprecated. Use  --list-options<br>
+　　　　　　[no-]show-policy-url and/or --verify-options [no-]show-policy-url instead.<br>
+<br>
+EXAMPLES<br>
+　　　gpg -se -r Bob file<br>
+　　　　　　sign and encrypt for user Bob<br>
+<br>
+　　　gpg --clear-sign file<br>
+　　　　　　make a cleartext signature<br>
+<br>
+　　　gpg -sb file<br>
+　　　　　　make a detached signature<br>
+<br>
+　　　gpg -u 0x12345678 -sb file<br>
+　　　　　　make a detached signature with the key 0x12345678<br>
+<br>
+　　　gpg --list-keys user_ID<br>
+　　　　　　show keys<br>
+<br>
+　　　gpg --fingerprint user_ID<br>
+　　　　　　show fingerprint<br>
+<br>
+　　　gpg --verify pgpfile<br>
+　　　gpg --verify sigfile [datafile]<br>
+　　　　　　Verify  the  signature  of  the file but do not output the data unless requested.  The second<br>
+　　　　　　form is used for detached signatures, where sigfile is the detached signature  (either  ASCII<br>
+　　　　　　armored  or  binary)  and datafile are the signed data; if this is not given, the name of the<br>
+　　　　　　file holding the signed data is constructed by cutting off the extension (".asc"  or  ".sig")<br>
+　　　　　　of  sigfile  or by asking the user for the filename.  If the option --output is also used the<br>
+　　　　　　signed data is written to the file specified by that option; use - to write the  signed  data<br>
+　　　　　　to stdout.<br>
+<br>
+HOW TO SPECIFY A USER ID<br>
+　　　There  are different ways to specify a user ID to GnuPG.  Some of them are only valid for gpg others<br>
+　　　are only good for gpgsm.  Here is the entire list of ways to specify a key:<br>
+<br>
+　　　By key Id.<br>
+　　　　　　This format is deduced from the length of the string and its content or 0x prefix. The key Id<br>
+　　　　　　of  an X.509 certificate are the low 64 bits of its SHA-1 fingerprint.  The use of key Ids is<br>
+　　　　　　just a shortcut, for all automated processing the fingerprint should be used.<br>
+<br>
+　　　　　　When using gpg an exclamation mark (!) may be appended to force using the  specified  primary<br>
+　　　　　　or secondary key and not to try and calculate which primary or secondary key to use.<br>
+<br>
+　　　　　　The  last  four lines of the example give the key ID in their long form as internally used by<br>
+　　　　　　the OpenPGP protocol. You can see the long key ID using the option --with-colons.<br>
+<br>
+　　　  234567C4<br>
+　　　  0F34E556E<br>
+　　　  01347A56A<br>
+　　　  0xAB123456<br>
+<br>
+　　　  234AABBCC34567C4<br>
+　　　  0F323456784E56EAB<br>
+　　　  01AB3FED1347A5612<br>
+　　　  0x234AABBCC34567C4<br>
+<br>
+　　　By fingerprint.<br>
+　　　　　　This format is deduced from the length of the string and its content or the 0x prefix.  Note,<br>
+　　　　　　that only the 20 byte version fingerprint is available with gpgsm (i.e. the SHA-1 hash of the<br>
+　　　　　　certificate).<br>
+<br>
+　　　　　　When using gpg an exclamation mark (!) may be appended to force using the  specified  primary<br>
+　　　　　　or secondary key and not to try and calculate which primary or secondary key to use.<br>
+<br>
+　　　　　　The best way to specify a key Id is by using the fingerprint.  This avoids any ambiguities in<br>
+　　　　　　case that there are duplicated key IDs.<br>
+<br>
+　　　  1234343434343434C434343434343434<br>
+　　　  123434343434343C3434343434343734349A3434<br>
+　　　  0E12343434343434343434EAB3484343434343434<br>
+　　　  0xE12343434343434343434EAB3484343434343434<br>
+<br>
+　　　gpgsm also accepts colons between each pair of hexadecimal digits because this is the de-facto stan‐<br>
+　　　dard  on  how  to  present X.509 fingerprints.  gpg also allows the use of the space separated SHA-1<br>
+　　　fingerprint as printed by the key listing commands.<br>
+<br>
+　　　By exact match on OpenPGP user ID.<br>
+　　　　　　This is denoted by a leading equal sign. It does not make sense for X.509 certificates.<br>
+<br>
+　　　  =Heinrich Heine <heinrichh@uni-duesseldorf.de><br>
+<br>
+　　　By exact match on an email address.<br>
+　　　　　　This is indicated by enclosing the email address in the usual way with left and right angles.<br>
+<br>
+　　　  <heinrichh@uni-duesseldorf.de><br>
+<br>
+　　　By partial match on an email address.<br>
+　　　　　　This is indicated by prefixing the search string with an @.  This uses a substring search but<br>
+　　　　　　considers only the mail address (i.e. inside the angle brackets).<br>
+<br>
+　　　  @heinrichh<br>
+<br>
+　　　By exact match on the subject's DN.<br>
+　　　　　　This  is  indicated  by  a leading slash, directly followed by the RFC-2253 encoded DN of the<br>
+　　　　　　subject.  Note that you can't use the string printed by gpgsm --list-keys  because  that  one<br>
+　　　　　　has  been  reordered  and modified for better readability; use --with-colons to print the raw<br>
+　　　　　　(but standard escaped) RFC-2253 string.<br>
+<br>
+　　　  /CN=Heinrich Heine,O=Poets,L=Paris,C=FR<br>
+<br>
+　　　By exact match on the issuer's DN.<br>
+　　　　　　This is indicated by a leading hash mark, directly followed by a slash and then directly fol‐<br>
+　　　　　　lowed  by the RFC-2253 encoded DN of the issuer.  This should return the Root cert of the is‐<br>
+　　　　　　suer.  See note above.<br>
+<br>
+　　　  #/CN=Root Cert,O=Poets,L=Paris,C=FR<br>
+<br>
+　　　By exact match on serial number and issuer's DN.<br>
+　　　　　　This is indicated by a hash mark, followed by the hexadecimal representation  of  the  serial<br>
+　　　　　　number, then followed by a slash and the RFC-2253 encoded DN of the issuer. See note above.<br>
+<br>
+　　　  #4F03/CN=Root Cert,O=Poets,L=Paris,C=FR<br>
+<br>
+　　　By keygrip.<br>
+　　　　　　This  is  indicated by an ampersand followed by the 40 hex digits of a keygrip.  gpgsm prints<br>
+　　　　　　the keygrip when using the command --dump-cert.<br>
+<br>
+　　　  &D75F22C3F86E355877348498CDC92BD21010A480<br>
+<br>
+　　　By substring match.<br>
+　　　　　　This is the default mode but applications may want to explicitly indicate this by putting the<br>
+　　　　　　asterisk in front.  Match is not case sensitive.<br>
+<br>
+　　　  Heine<br>
+　　　  *Heine<br>
+<br>
+　　　. and + prefixes<br>
+　　　　　　These  prefixes  are  reserved for looking up mails anchored at the end and for a word search<br>
+　　　　　　mode.  They are not yet implemented and using them is undefined.<br>
+<br>
+　　　　　　Please note that we have reused the hash mark identifier which was used in old GnuPG versions<br>
+　　　　　　to  indicate  the so called local-id.  It is not anymore used and there should be no conflict<br>
+　　　　　　when used with X.509 stuff.<br>
+<br>
+　　　　　　Using the RFC-2253 format of DNs has the drawback that it is not possible to map them back to<br>
+　　　　　　the  original encoding, however we don't have to do this because our key database stores this<br>
+　　　　　　encoding as meta data.<br>
+<br>
+FILTER EXPRESSIONS<br>
+　　　The options --import-filter and --export-filter use expressions with this  syntax  (square  brackets<br>
+　　　indicate  an  optional  part and curly braces a repetition, white space between the elements are al‐<br>
+　　　lowed):<br>
+<br>
+　　　　　　    [lc] {[{flag}] PROPNAME op VALUE [lc]}<br>
+<br>
+　　　The name of a property (PROPNAME) may only consist of letters, digits and underscores.  The descrip‐<br>
+　　　tion  for  the filter type describes which properties are defined.  If an undefined property is used<br>
+　　　it evaluates to the empty string.  Unless otherwise noted, the VALUE must always be  given  and  may<br>
+　　　not  be  the  empty string.  No quoting is defined for the value, thus the value may not contain the<br>
+　　　strings && or ||, which are used as logical connection operators.  The flag -- can be used to remove<br>
+　　　this restriction.<br>
+<br>
+　　　Numerical  values  are computed as long int; standard C notation applies.  lc is the logical connec‐<br>
+　　　tion operator; either && for a conjunction or || for a disjunction.  A conjunction is assumed at the<br>
+　　　begin  of  an  expression.   Conjunctions have higher precedence than disjunctions.  If VALUE starts<br>
+　　　with one of the characters used in any op a space after the op is required.<br>
+<br>
+　　　The supported operators (op) are:<br>
+<br>
+　　　=~     Substring must match.<br>
+<br>
+　　　!~     Substring must not match.<br>
+<br>
+　　　=      The full string must match.<br>
+<br>
+　　　<>     The full string must not match.<br>
+<br>
+　　　==     The numerical value must match.<br>
+<br>
+　　　!=     The numerical value must not match.<br>
+<br>
+　　　<=     The numerical value of the field must be LE than the value.<br>
+<br>
+　　　<      The numerical value of the field must be LT than the value.<br>
+<br>
+　　　>      The numerical value of the field must be GT than the value.<br>
+<br>
+　　　>=     The numerical value of the field must be GE than the value.<br>
+<br>
+　　　-le    The string value of the field must be less or equal than the value.<br>
+<br>
+　　　-lt    The string value of the field must be less than the value.<br>
+<br>
+　　　-gt    The string value of the field must be greater than the value.<br>
+<br>
+　　　-ge    The string value of the field must be greater or equal than the value.<br>
+<br>
+　　　-n     True if value is not empty (no value allowed).<br>
+<br>
+　　　-z     True if value is empty (no value allowed).<br>
+<br>
+　　　-t     Alias for "PROPNAME != 0" (no value allowed).<br>
+<br>
+　　　-f     Alias for "PROPNAME == 0" (no value allowed).<br>
+<br>
+　　　Values for flag must be space separated.  The supported flags are:<br>
+<br>
+　　　--     VALUE spans to the end of the expression.<br>
+<br>
+　　　-c     The string match in this part is done case-sensitive.<br>
+<br>
+　　　The filter options concatenate several specifications for a filter of the same  type.   For  example<br>
+　　　the four options in this example:<br>
+<br>
+　　　　　　   --import-filter keep-uid="uid =~ Alfa"<br>
+　　　　　　   --import-filter keep-uid="&& uid !~ Test"<br>
+　　　　　　   --import-filter keep-uid="|| uid =~ Alpha"<br>
+　　　　　　   --import-filter keep-uid="uid !~ Test"<br>
+<br>
+　　　which is equivalent to<br>
+<br>
+　　　　　　   --import-filter \<br>
+　　　　　　    keep-uid="uid =~ Alfa" && uid !~ Test" || uid =~ Alpha" && "uid !~ Test"<br>
+<br>
+　　　imports  only  the  user  ids  of  a key containing the strings "Alfa" or "Alpha" but not the string<br>
+　　　"test".<br>
+<br>
+TRUST VALUES<br>
+　　　Trust values are used to indicate ownertrust and validity of keys and user IDs.  They are  displayed<br>
+　　　with letters or strings:<br>
+<br>
+　　　-<br>
+　　　unknown<br>
+　　　　　　No ownertrust assigned / not yet calculated.<br>
+<br>
+　　　e<br>
+　　　expired<br>
+<br>
+　　　　　　Trust calculation has failed; probably due to an expired key.<br>
+<br>
+　　　q<br>
+　　　undefined, undef<br>
+　　　　　　Not enough information for calculation.<br>
+<br>
+　　　n<br>
+　　　never  Never trust this key.<br>
+<br>
+　　　m<br>
+　　　marginal<br>
+　　　　　　Marginally trusted.<br>
+<br>
+　　　f<br>
+　　　full   Fully trusted.<br>
+<br>
+　　　u<br>
+　　　ultimate<br>
+　　　　　　Ultimately trusted.<br>
+<br>
+　　　r<br>
+　　　revoked<br>
+　　　　　　For validity only: the key or the user ID has been revoked.<br>
+<br>
+　　　?<br>
+　　　err    The program encountered an unknown trust value.<br>
+<br>
+FILES<br>
+　　　There  are  a  few  configuration files to control certain aspects of gpg's operation. Unless noted,<br>
+　　　they are expected in the current home directory (see: [option --homedir]).<br>
+<br>
+　　　gpg.conf<br>
+　　　　　　This is the standard configuration file read by gpg on startup.  It  may  contain  any  valid<br>
+　　　　　　long option; the leading two dashes may not be entered and the option may not be abbreviated.<br>
+　　　　　　This default name may be changed on the command  line  (see:  [gpg-option  --options]).   You<br>
+　　　　　　should backup this file.<br>
+<br>
+　　　Note  that  on  larger  installations,  it  is  useful  to  put  predefined files into the directory<br>
+　　　‘/etc/skel/.gnupg’ so that newly created users start up with a working configuration.  For  existing<br>
+　　　users a small helper script is provided to create these files (see: [addgnupghome]).<br>
+<br>
+　　　For internal purposes gpg creates and maintains a few other files; They all live in the current home<br>
+　　　directory (see: [option --homedir]).  Only the gpg program may modify these files.<br>
+<br>
+　　　~/.gnupg<br>
+　　　　　　This is the default home  directory  which  is  used  if  neither  the  environment  variable<br>
+　　　　　　GNUPGHOME nor the option --homedir is given.<br>
+<br>
+　　　~/.gnupg/pubring.gpg<br>
+　　　　　　The public keyring using a legacy format.  You should backup this file.<br>
+<br>
+　　　　　　If this file is not available, gpg defaults to the new keybox format and creates a file ‘pub‐<br>
+　　　　　　ring.kbx’ unless that file already exists in which case that  file  will  also  be  used  for<br>
+　　　　　　OpenPGP keys.<br>
+<br>
+　　　　　　Note  that in the case that both files, ‘pubring.gpg’ and ‘pubring.kbx’ exists but the latter<br>
+　　　　　　has no OpenPGP keys, the legacy file ‘pubring.gpg’ will be used.  Take care:  GnuPG  versions<br>
+　　　　　　before 2.1 will always use the file ‘pubring.gpg’ because they do not know about the new key‐<br>
+　　　　　　box format. In the case that you have to use GnuPG 1.4 to decrypt archived  data  you  should<br>
+　　　　　　keep this file.<br>
+<br>
+　　　~/.gnupg/pubring.gpg.lock<br>
+　　　　　　The lock file for the public keyring.<br>
+<br>
+　　　~/.gnupg/pubring.kbx<br>
+　　　　　　The  public keyring using the new keybox format.  This file is shared with gpgsm.  You should<br>
+　　　　　　backup this file.  See above for the relation between this file and it predecessor.<br>
+<br>
+　　　　　　To convert an existing ‘pubring.gpg’ file to the keybox format, you  first  backup  the  own‐<br>
+　　　　　　ertrust  values,  then rename ‘pubring.gpg’ to ‘publickeys.backup’, so it won’t be recognized<br>
+　　　　　　by any GnuPG version, run import, and finally restore the ownertrust values:<br>
+<br>
+　　　  $ cd ~/.gnupg<br>
+　　　  $ gpg --export-ownertrust >otrust.lst<br>
+　　　  $ mv pubring.gpg publickeys.backup<br>
+　　　  $ gpg --import-options restore --import publickeys.backups<br>
+　　　  $ gpg --import-ownertrust otrust.lst<br>
+<br>
+　　　~/.gnupg/pubring.kbx.lock<br>
+　　　　　　The lock file for ‘pubring.kbx’.<br>
+<br>
+　　　~/.gnupg/secring.gpg<br>
+　　　　　　The legacy secret keyring as used by GnuPG versions before 2.1.  It is not used by GnuPG  2.1<br>
+　　　　　　and  later.   You  may  want to keep it in case you have to use GnuPG 1.4 to decrypt archived<br>
+　　　　　　data.<br>
+<br>
+　　　~/.gnupg/secring.gpg.lock<br>
+　　　　　　The lock file for the legacy secret keyring.<br>
+<br>
+　　　~/.gnupg/.gpg-v21-migrated<br>
+　　　　　　File indicating that a migration to GnuPG 2.1 has been done.<br>
+<br>
+　　　~/.gnupg/trustdb.gpg<br>
+　　　　　　The trust database.  There is no need to backup this file; it is better to  backup  the  own‐<br>
+　　　　　　ertrust values (see: [option --export-ownertrust]).<br>
+<br>
+　　　~/.gnupg/trustdb.gpg.lock<br>
+　　　　　　The lock file for the trust database.<br>
+<br>
+　　　~/.gnupg/random_seed<br>
+　　　　　　A file used to preserve the state of the internal random pool.<br>
+<br>
+　　　~/.gnupg/openpgp-revocs.d/<br>
+　　　　　　This  is the directory where gpg stores pre-generated revocation certificates.  The file name<br>
+　　　　　　corresponds to the OpenPGP fingerprint of the respective key.   It  is  suggested  to  backup<br>
+　　　　　　those  certificates  and if the primary private key is not stored on the disk to move them to<br>
+　　　　　　an external storage device.  Anyone who can access theses files is able to revoke the  corre‐<br>
+　　　　　　sponding key.  You may want to print them out.  You should backup all files in this directory<br>
+　　　　　　and take care to keep this backup closed away.<br>
+<br>
+　　　Operation is further controlled by a few environment variables:<br>
+<br>
+　　　HOME   Used to locate the default home directory.<br>
+<br>
+　　　GNUPGHOME<br>
+　　　　　　If set directory used instead of "~/.gnupg".<br>
+<br>
+　　　GPG_AGENT_INFO<br>
+　　　　　　This variable is obsolete; it was used by GnuPG versions before 2.1.<br>
+<br>
+　　　PINENTRY_USER_DATA<br>
+　　　　　　This value is passed via gpg-agent to pinentry.  It is useful to convey extra information  to<br>
+　　　　　　a custom pinentry.<br>
+<br>
+　　　COLUMNS<br>
+　　　LINES  Used to size some displays to the full size of the screen.<br>
+<br>
+　　　LANGUAGE<br>
+　　　　　　Apart  from  its use by GNU, it is used in the W32 version to override the language selection<br>
+　　　　　　done through the Registry.  If used and set to a valid and available language name  (langid),<br>
+　　　　　　the  file with the translation is loaded from gpgdir/gnupg.nls/langid.mo.  Here gpgdir is the<br>
+　　　　　　directory out of which the gpg binary has been loaded.  If it can't be loaded the Registry is<br>
+　　　　　　tried and as last resort the native Windows locale system is used.<br>
+<br>
+　　　When  calling  the  gpg-agent  component gpg sends a set of environment variables to gpg-agent.  The<br>
+　　　names of these variables can be listed using the command:<br>
+<br>
+　　　    gpg-connect-agent 'getinfo std_env_names' /bye | awk '$1=="D" {print $2}'<br>
+<br>
+BUGS<br>
+　　　On older systems this program should be installed as setuid(root). This is necessary to lock  memory<br>
+　　　pages.  Locking memory pages prevents the operating system from writing memory pages (which may con‐<br>
+　　　tain passphrases or other sensitive material) to disk. If you get no warning message about  insecure<br>
+　　　memory  your operating system supports locking without being root. The program drops root privileges<br>
+　　　as soon as locked memory is allocated.<br>
+<br>
+　　　Note also that some systems (especially laptops) have the ability to ``suspend to disk'' (also known<br>
+　　　as  ``safe  sleep'' or ``hibernate'').  This writes all memory to disk before going into a low power<br>
+　　　or even powered off mode.  Unless measures are taken in the operating system to  protect  the  saved<br>
+　　　memory, passphrases or other sensitive material may be recoverable from it later.<br>
+<br>
+　　　Before  you  report a bug you should first search the mailing list archives for similar problems and<br>
+　　　second  check  whether  such  a  bug  has  already   been   reported   to   our   bug   tracker   at<br>
+　　　https://bugs.gnupg.org.<br>
+<br>
+SEE ALSO<br>
+　　　gpgv(1), gpgsm(1), gpg-agent(1)<br>
+<br>
+　　　The  full documentation for this tool is maintained as a Texinfo manual.  If GnuPG and the info pro‐<br>
+　　　gram are properly installed at your site, the command<br>
+<br>
+　　　  info gnupg<br>
+<br>
+　　　should give you access to the complete manual including a menu structure and an index.<br>
+<br>
+GnuPG 2.2.27　　　　　　　　　　　　　　　  2020-12-21　　　　　　　　　　　　　　　　　　GPG(1)<br>
+
+</html>
