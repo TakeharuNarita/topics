@@ -10,10 +10,22 @@ def htmltxt
   org_txt
 end
 
+class GithubHtml()
+  def initialize(html_txt)
+    @html = html_txt
+  end
 
-ix_count = 0
-cell_data = []
-tbodytxt = htmltxt.match(/<tbody.*?>.*?<\/tbody>/m)&.[](0)
+  def target_element(tag_name)
+    @target = @html_txt.match(/<#{tag_name}.*?>.*?<\/#{tag_name}>/m)&.[](0)
+  end
+
+  def convert_to_cell(transpose = false)
+    ix_count = 0
+    cell_data = []
+    
+  end
+end
+
 loop do
   day_of_week = tbodytxt.scan(/<td .*? data-ix="#{ix_count}" .*?>.*?<\/td>/)
   break if day_of_week.size == 0
