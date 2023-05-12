@@ -3,7 +3,7 @@
 def htmltxt
   path = "../temp/take.html"
   # path = gets.chomp
-  f = File.open(path, "r")
+  f = File.open(path, 'r')
   org_txt = f.read
   f.close
   org_txt
@@ -12,11 +12,11 @@ end
 # @param none
 class GithubHtml
   def initialize(html_txt)
-    @html = html_txt
+    @html_txt = html_txt
   end
 
   def target_element(tag_name)
-    @target = @html_txt.match(/<#{tag_name}.*?>.*?<\/#{tag_name}>/m)&.[](0)
+    p @target = @html_txt.match(/<#{tag_name}.*?>[\s\S]*?\n<\/#{tag_name}>/)&.[](0)
   end
 
   def convert_to_cell(transpose = false) # rubocop:disable Metrics/MethodLength
@@ -40,8 +40,11 @@ end
 
 # pp cell_data
 
+ghh = GithubHtml.new(htmltxt)
+ghh.target_element('tbody')
+
 i = 0
-cell_data.each do |row|
+ghh.convert_to_cell(true).each do |row|
   sumcom = row.sum do |one_day|
     if one_day.match?(/^\d+? /)
       one_day.match(/^(\d+?) /)&.[](1).to_i
