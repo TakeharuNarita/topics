@@ -1,21 +1,21 @@
 # frozen_string_literal: true
 
+# @param none
 def htmltxt
-  gets.chomp
-  f = File.open(htmltxt, "r")
+  path = "../temp/take.html"
+  # path = gets.chomp
+  f = File.open(path, "r")
   org_txt = f.read
   f.close
   org_txt
 end
 
-f = File.open(htmltxt, "r")
-org_txt = f.read
-f.close
 
 ix_count = 0
 cell_data = []
+tbodytxt = htmltxt.match(/<tbody.*?>.*?<\/tbody>/m)&.[](0)
 loop do
-  day_of_week = org_txt.scan(/<td .*? data-ix="#{ix_count}" .*?>.*?<\/td>/)
+  day_of_week = tbodytxt.scan(/<td .*? data-ix="#{ix_count}" .*?>.*?<\/td>/)
   break if day_of_week.size == 0
 
   (day_of_week.size).times do |i|
