@@ -82,5 +82,3 @@ class GithubSumCommit
 end
 
 GithubSumCommit.new.cat
-
-# rubocop:enable Layout/EndOfLine
