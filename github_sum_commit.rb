@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# @param none
 def htmltxt
   path = "../temp/take.html"
   # path = gets.chomp
@@ -10,7 +9,8 @@ def htmltxt
   org_txt
 end
 
-class GithubHtml()
+# @param none
+class GithubHtml
   def initialize(html_txt)
     @html = html_txt
   end
@@ -19,24 +19,25 @@ class GithubHtml()
     @target = @html_txt.match(/<#{tag_name}.*?>.*?<\/#{tag_name}>/m)&.[](0)
   end
 
-  def convert_to_cell(transpose = false)
+  def convert_to_cell(transpose = false) # rubocop:disable Metrics/MethodLength
     ix_count = 0
     cell_data = []
+    loop do
+      day_of_week = @target.scan(/<td .*? data-ix="#{ix_count}" .*?>.*?<\/td>/)
+      break if day_of_week.size == 0
     
+      (day_of_week.size).times do |i|
+        x = transpose ? ix_count : i
+        y = transpose ? i : ix_count
+        cell_data[x] ||= []
+        cell_data[x][y] = day_of_week[i].match(/<span class=".*?">(.+?)<\/span><\/td>/)&.[](1)
+      end
+      ix_count += 1
+    end
+    cell_data
   end
 end
 
-loop do
-  day_of_week = tbodytxt.scan(/<td .*? data-ix="#{ix_count}" .*?>.*?<\/td>/)
-  break if day_of_week.size == 0
-
-  (day_of_week.size).times do |i|
-    cell_data[ix_count] ||= []
-    cell_data[ix_count][i] = day_of_week[i].match(/<span class=".*?">(.+?)<\/span><\/td>/)&.[](1)
-  end
-  
-  ix_count += 1
-end
 # pp cell_data
 
 i = 0
