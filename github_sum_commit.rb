@@ -1,6 +1,11 @@
+# frozen_string_literal: true
 
 def htmltxt
   gets.chomp
+  f = File.open(htmltxt, "r")
+  org_txt = f.read
+  f.close
+  org_txt
 end
 
 f = File.open(htmltxt, "r")
