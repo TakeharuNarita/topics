@@ -1,14 +1,5 @@
 # frozen_string_literal: true
 
-def htmltxt
-  path = "../temp/take.html"
-  # path = gets.chomp
-  f = File.open(path, 'r')
-  org_txt = f.read
-  f.close
-  org_txt
-end
-
 # @param none
 class GithubHtml
   def initialize(html_txt)
@@ -16,7 +7,7 @@ class GithubHtml
   end
 
   def target_element(tag_name)
-    p @target = @html_txt.match(/<#{tag_name}.*?>[\s\S]*?\n<\/#{tag_name}>/)&.[](0)
+    @target = @html_txt.match(/<#{tag_name}.*?>[\s\S]*?\n.*?<\/#{tag_name}>/)&.[](0)
   end
 
   def convert_to_cell(transpose = false) # rubocop:disable Metrics/MethodLength
@@ -40,19 +31,48 @@ end
 
 # pp cell_data
 
-ghh = GithubHtml.new(htmltxt)
-ghh.target_element('tbody')
-
-i = 0
-ghh.convert_to_cell(true).each do |row|
-  sumcom = row.sum do |one_day|
-    if one_day.match?(/^\d+? /)
-      one_day.match(/^(\d+?) /)&.[](1).to_i
-    else
-      0
-    end
+class GithubSumCommit
+  def initialize
+    @ghh = GithubHtml.new(htmltxt)
+    @ghh.target_element('tbody')
   end
-  # puts "#{sumcom}"
-  puts "week:#{i} #{sumcom}/#{row.size} days #{ "%#.05g" % ( sumcom.to_f / row.size ) } avg"
-  i += 1
+
+  private def htmltxt
+    path = '../temp/take.html'
+    # path = gets.chomp
+    f = File.open(path, 'r')
+    org_txt = f.read
+    f.close
+    org_txt
+  end
+
+  private def sums
+    i = 0
+    ret = []
+    @ghh.convert_to_cell(true).each do |row|
+      sumcom = row.sum do |one_day|
+        if one_day.match?(/^\d+? /)
+          one_day.match(/^(\d+?) /)&.[](1).to_i
+        else
+          0
+        end
+      end
+      # puts "#{sumcom}"
+      ret << sumcom
+      ret << row.size
+      i += 1
+    end
+    ret
+  end
+  
+  def cat
+    al = sums
+    (al.size/2).times do |i|
+      puts "week:#{i} #{al[i*2]}/#{al[i*2+1]} days #{'%#.05g' % (al[i*2].to_f / al[i*2+1])} avg"
+    end
+    self
+  end
 end
+
+
+GithubSumCommit.new.cat
