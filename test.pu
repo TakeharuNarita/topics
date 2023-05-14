@@ -1,34 +1,77 @@
+@startuml ERDiagram
 
 !define Table(name,desc) class name as "desc" << (T,#FFAAAA) >>
-!define primary_key(x) <b><color:red>x</color></b>
-!define foreign_key(x) <color:blue>x</color>
-hide methods
-hide stereotypes
+!define PrimaryKey(x) <color:red>x</color>
+!define ForeignKey(x) <color:blue>x</color>
+!define Index(x) <color:green>x</color>
 
-Table(ユーザーテーブル, "ユーザーテーブル") {
-    primary_key(ID)
-    名前
+!define AUTO_INCREMENT(x) <color:orange>x</color>
+!define NULL(x) <color:gray>x</color>
+
+hide empty attributes
+
+Table(channels, "channels") {
+  + PRIMARY KEY {id} INT(11) <b><u><color:red>PRIMARY</color></u></b> AUTO_INCREMENT
+  name VARCHAR(100) NULL
 }
 
-Table(商品テーブル, "商品テーブル") {
-    primary_key(商品ID)
-    商品名
-    値段
-    foreign_key(カテゴリーID)
+Table(time_slots, "time_slots") {
+  + PRIMARY KEY {id} INT(11) <b><u><color:red>PRIMARY</color></u></b> AUTO_INCREMENT
+  channel_id INT(11) <b><u><color:blue>INDEX</color></u></b>
+  start_time DATETIME NULL
+  end_time DATETIME NULL
+  FOREIGN KEY (channel_id) REFERENCES channels(id)
 }
 
-Table(カテゴリーテーブル, "カテゴリーテーブル") {
-    primary_key(カテゴリーID)
-    カテゴリー名
+Table(shows, "shows") {
+  + PRIMARY KEY {id} INT(11) <b><u><color:red>PRIMARY</color></u></b> AUTO_INCREMENT
+  title VARCHAR(255) NULL
+  description TEXT NULL
 }
 
-Table(購入履歴テーブル, "購入履歴テーブル") {
-    primary_key(購入ID)
-    foreign_key(ユーザーID)
-    foreign_key(商品ID)
-    購入日
+Table(genres, "genres") {
+  + PRIMARY KEY {id} INT(11) <b><u><color:red>PRIMARY</color></u></b> AUTO_INCREMENT
+  name VARCHAR(100) NULL
 }
 
-ユーザーテーブル -- 購入履歴テーブル : "1--N"
-商品テーブル -- 購入履歴テーブル : "1--N"
-カテゴリーテーブル -- 商品テーブル : "1--N"
+Table(show_genres, "show_genres") {
+  show_id INT(11) <b><u><color:blue>INDEX</color></u></b>
+  genre_id INT(11) <b><u><color:blue>INDEX</color></u></b>
+  FOREIGN KEY (show_id) REFERENCES shows(id)
+  FOREIGN KEY (genre_id) REFERENCES genres(id)
+}
+
+Table(seasons, "seasons") {
+  + PRIMARY KEY {id} INT(11) <b><u><color:red>PRIMARY</color></u></b> AUTO_INCREMENT
+  show_id INT(11) <b><u><color:blue>INDEX</color></u></b>
+  season_number INT(11) NULL
+  FOREIGN KEY (show_id) REFERENCES shows(id)
+}
+
+Table(episodes, "episodes") {
+  + PRIMARY KEY {id} INT(11) <b><u><color:red>PRIMARY</color></u></b> AUTO_INCREMENT
+  season_id INT(11) NULL <b><u><color:blue>INDEX</color></u></b>
+  episode_number INT(11) NULL
+  title VARCHAR(255) NULL
+  description TEXT NULL
+  duration INT(11) NULL
+  air_date DATE NULL
+  FOREIGN KEY (season_id) REFERENCES seasons(id)
+}
+
+Table(view_counts, "view_counts") {
+  + PRIMARY KEY {id} INT(11) <b><u>color:redPRIMARY</color></u></b> AUTO_INCREMENT
+time_slot_id INT(11) <b><u>color:blueINDEX</color></u></b>
+episode_id INT(11) <b><u>color:blueINDEX</color></u></b>
+views INT(11) NULL
+FOREIGN KEY (time_slot_id) REFERENCES time_slots(id)
+FOREIGN KEY (episode_id) REFERENCES episodes(id)
+}
+
+shows -- genres : <b><u>color:blueshow_genres</color></u></b>
+shows -- seasons : <b><u>color:blueseasons</color></u></b>
+seasons -- episodes : <b><u>color:blueepisodes</color></u></b>
+time_slots -- channels : <b><u>color:bluechannels</color></u></b>
+episodes -- view_counts : <b><u>color:blueview_counts</color></u></b>
+
+@enduml
