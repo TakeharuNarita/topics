@@ -4,7 +4,7 @@
 sudo apt-get update -y
 
 # Install MySQL Workbench
-sudo apt-get install -y mysql-workbench
+sudo apt-get install mysql-workbench
 
 # Verify installation
 mysql-workbench --version
