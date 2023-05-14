@@ -1,77 +1,69 @@
-@startuml ERDiagram
+@startuml
 
-!define Table(name,desc) class name as "desc" << (T,#FFAAAA) >>
-!define PrimaryKey(x) <color:red>x</color>
-!define ForeignKey(x) <color:blue>x</color>
-!define Index(x) <color:green>x</color>
-
-!define AUTO_INCREMENT(x) <color:orange>x</color>
-!define NULL(x) <color:gray>x</color>
-
-hide empty attributes
-
-Table(channels, "channels") {
-  + PRIMARY KEY {id} INT(11) <b><u><color:red>PRIMARY</color></u></b> AUTO_INCREMENT
-  name VARCHAR(100) NULL
+entity "channels" {
+  + id : int
+  --
+  name : varchar
 }
 
-Table(time_slots, "time_slots") {
-  + PRIMARY KEY {id} INT(11) <b><u><color:red>PRIMARY</color></u></b> AUTO_INCREMENT
-  channel_id INT(11) <b><u><color:blue>INDEX</color></u></b>
-  start_time DATETIME NULL
-  end_time DATETIME NULL
-  FOREIGN KEY (channel_id) REFERENCES channels(id)
+entity "shows" {
+  + id : int
+  --
+  title : varchar
+  description : varchar
 }
 
-Table(shows, "shows") {
-  + PRIMARY KEY {id} INT(11) <b><u><color:red>PRIMARY</color></u></b> AUTO_INCREMENT
-  title VARCHAR(255) NULL
-  description TEXT NULL
+entity "seasons" {
+  + id : int
+  --
+  season_number : int
+  show_id : int
 }
 
-Table(genres, "genres") {
-  + PRIMARY KEY {id} INT(11) <b><u><color:red>PRIMARY</color></u></b> AUTO_INCREMENT
-  name VARCHAR(100) NULL
+entity "episodes" {
+  + id : int
+  --
+  title : varchar
+  description : varchar
+  episode_number : int
+  season_id : int
 }
 
-Table(show_genres, "show_genres") {
-  show_id INT(11) <b><u><color:blue>INDEX</color></u></b>
-  genre_id INT(11) <b><u><color:blue>INDEX</color></u></b>
-  FOREIGN KEY (show_id) REFERENCES shows(id)
-  FOREIGN KEY (genre_id) REFERENCES genres(id)
+entity "time_slots" {
+  + id : int
+  --
+  start_time : datetime
+  end_time : datetime
+  channel_id : int
 }
 
-Table(seasons, "seasons") {
-  + PRIMARY KEY {id} INT(11) <b><u><color:red>PRIMARY</color></u></b> AUTO_INCREMENT
-  show_id INT(11) <b><u><color:blue>INDEX</color></u></b>
-  season_number INT(11) NULL
-  FOREIGN KEY (show_id) REFERENCES shows(id)
+entity "view_counts" {
+  + id : int
+  --
+  views : int
+  episode_id : int
+  time_slot_id : int
 }
 
-Table(episodes, "episodes") {
-  + PRIMARY KEY {id} INT(11) <b><u><color:red>PRIMARY</color></u></b> AUTO_INCREMENT
-  season_id INT(11) NULL <b><u><color:blue>INDEX</color></u></b>
-  episode_number INT(11) NULL
-  title VARCHAR(255) NULL
-  description TEXT NULL
-  duration INT(11) NULL
-  air_date DATE NULL
-  FOREIGN KEY (season_id) REFERENCES seasons(id)
+entity "genres" {
+  + id : int
+  --
+  name : varchar
 }
 
-Table(view_counts, "view_counts") {
-  + PRIMARY KEY {id} INT(11) <b><u>color:redPRIMARY</color></u></b> AUTO_INCREMENT
-time_slot_id INT(11) <b><u>color:blueINDEX</color></u></b>
-episode_id INT(11) <b><u>color:blueINDEX</color></u></b>
-views INT(11) NULL
-FOREIGN KEY (time_slot_id) REFERENCES time_slots(id)
-FOREIGN KEY (episode_id) REFERENCES episodes(id)
+entity "shows_genres" {
+  + id : int
+  --
+  show_id : int
+  genre_id : int
 }
 
-shows -- genres : <b><u>color:blueshow_genres</color></u></b>
-shows -- seasons : <b><u>color:blueseasons</color></u></b>
-seasons -- episodes : <b><u>color:blueepisodes</color></u></b>
-time_slots -- channels : <b><u>color:bluechannels</color></u></b>
-episodes -- view_counts : <b><u>color:blueview_counts</color></u></b>
+channels ||--o{ time_slots : has
+shows ||--o{ seasons : has
+seasons ||--o{ episodes : has
+episodes ||--o{ view_counts : has
+time_slots ||--o{ view_counts : has
+shows ||--o{ shows_genres : has
+genres ||--o{ shows_genres : has
 
 @enduml
