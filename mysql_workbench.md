@@ -1,4 +1,4 @@
-## テーブル設計に基づいて、ER図を作成する手順
+## テーブル設計に基づいて、MySQL WorkbenchでER図を作成する手順
 
 まず、MySQL Workbenchを開き、「File」メニューから「New Model」を選択します。
 
