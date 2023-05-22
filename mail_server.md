@@ -118,7 +118,11 @@ sudo systemctl restart postfix
 
 メールを送信するためには、メールクライアントとして`mail`コマンドを使用できます。ただし、`mail`コマンドは通常はUbuntuにはインストールされていませんので、以下の手順で`mailutils`パッケージをインストールします。
 
-1. **Mailutilsのインストール:** 以下のコマンドを使用します：
+<ol>
+
+## <li>Mailutilsのインストール</li>
+
+以下のコマンドを使用します：
 
 ```bash
 sudo apt-get install mailutils
@@ -126,7 +130,9 @@ sudo apt-get install mailutils
 
 これで`mail`コマンドが使用可能になります。
 
-2. **メールの送信:** 以下の形式で`mail`コマンドを使用してメールを送信します：
+## <li>メールの送信</li>
+
+以下の形式で`mail`コマンドを使用してメールを送信します：
 
 ```bash
 echo "This is the body of the email" | mail -s "This is the subject line" t995771@gmail.com
@@ -134,3 +140,4 @@ echo "This is the body of the email" | mail -s "This is the subject line" t99577
 
 これは、"This is the subject line"という件名で、"This is the body of the email"という本文のメールをt995771@gmail.com宛に送信します。
 
+</ol>
