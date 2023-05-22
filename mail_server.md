@@ -110,6 +110,27 @@ home_mailbox = Maildir/
 sudo systemctl restart postfix
 ```
 
-以上が基本的なPostfixのインストールと設定の手順です。ただし、具体的な設定は使用するシステムやネットワーク環境によります。なお、Postfixの設定は非常に複雑で、上記の設定だけで十分な場合もあれば、より詳細な設定が必要な場合もあります。また、メールサーバーはスパム対策やセキュリティ対策が重要なので、それらについても考慮する必要があります。
-
 </ol>
+
+
+
+# `mailutils`パッケージをインストール
+
+メールを送信するためには、メールクライアントとして`mail`コマンドを使用できます。ただし、`mail`コマンドは通常はUbuntuにはインストールされていませんので、以下の手順で`mailutils`パッケージをインストールします。
+
+1. **Mailutilsのインストール:** 以下のコマンドを使用します：
+
+```bash
+sudo apt-get install mailutils
+```
+
+これで`mail`コマンドが使用可能になります。
+
+2. **メールの送信:** 以下の形式で`mail`コマンドを使用してメールを送信します：
+
+```bash
+echo "This is the body of the email" | mail -s "This is the subject line" t995771@gmail.com
+```
+
+これは、"This is the subject line"という件名で、"This is the body of the email"という本文のメールをt995771@gmail.com宛に送信します。
+
