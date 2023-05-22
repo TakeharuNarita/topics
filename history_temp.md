@@ -5,10 +5,10 @@
 sudo apt-get update
 sudo apt-get upgrade
 sudo apt-get -y install dovecot-pop3d
-nano /etc/dovecot/dovecot.conf
+sudo nano /etc/dovecot/dovecot.conf
 ```
 
-```conf
+```bash conf
 ## Dovecot configuration file
 
 # If you're in a hurry, see http://wiki2.dovecot.org/QuickConfiguration
@@ -142,7 +142,7 @@ sudo apt-get install postfix
 sudo nano /etc/postfix/main.cf
 ```
 
-```conf
+```bash conf
 # See /usr/share/postfix/main.cf.dist for a commented, more complete version
 
 
