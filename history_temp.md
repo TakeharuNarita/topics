@@ -193,6 +193,10 @@ inet_protocols = all
 home_mailbox = Maildir/
 ```
 
+```bash
+sudo systemctl restart postfix
+```
+
 ### port
 
 ```bash
