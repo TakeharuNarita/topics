@@ -26,7 +26,7 @@ $ ~/.config/Code/User/settings.json
 
 
 ```bash
-$ ~//.config/Code/User/keybindings.json
+$ ~/.config/Code/User/keybindings.json
 ```
 
 ```json
