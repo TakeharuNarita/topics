@@ -55,8 +55,8 @@ class GithubSumCommit
   private
 
   def htmltxt
-    # path = gets.chomp
-    path = 'TakeharuNarita (Takeharu Narita).html'
+    print 'input html file path:'
+    path = gets.chomp
     f = File.open(path, 'r')
     org_txt = f.read
     f.close
