@@ -1,6 +1,8 @@
 
 # API一覧
 
+## なぜ
+
 |||
 | - | - |
 | OpenWeatherMap | 天気情報を提供するAPIです。現在の天気、予報、過去の天気データなどを取得できます。 |
@@ -28,3 +30,5 @@
 | CoinGecko API | 仮想通貨の価格や市場情報を取得するためのAPIです。 |
 | Giphy API | GiphyのGIF画像を検索・取得するためのAPIです。 |
 | Unsplash API | Unsplashの高品質なフリー写真を検索・取得するためのAPIです。 |
+
+## 結果
