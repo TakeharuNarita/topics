@@ -6,10 +6,18 @@ Ubuntu環境で作業をしていると、繰り返し行う作業をスクリ�
 
 ## スクリプトの作成
 
-まずは、実行したいコマンドをスクリプトとして作成します。この例では`/usr/local/bin`ディレクトリに`myscript`という名前のスクリプトを作成します。任意のテキストエディタを用いてスクリプトを作成しましょう。
+まずは、実行したいコマンドをスクリプトとして作成します。
+この例では`/usr/local/bin`ディレクトリに`myscript`という名前のスクリプトを作成します。
 
 ```bash
-sudo nano /usr/local/bin/myscript
+cd /usr/local/bin
+sudo touch myscript
+```
+
+任意のテキストエディタを用いてスクリプトを作成しましょう。
+
+```bash
+sudo nano myscript
 ```
 
 そして、以下のような内容を記述します。
@@ -25,7 +33,7 @@ echo "Hello, this is my custom command!"
 スクリプトを作成したら、それを実行可能な状態にします。これには`chmod`コマンドを使用します。
 
 ```bash
-sudo chmod +x /usr/local/bin/myscript
+sudo chmod +x myscript
 ```
 
 ## パスを通す?
