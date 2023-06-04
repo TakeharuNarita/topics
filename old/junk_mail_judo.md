@@ -15,8 +15,13 @@
 
 会社等の公開メールアドレスに対して届く迷惑メールを仕分けるアプリケーションです。
 
+[Googleを見る](Google)
+
+[Google]: http://www.yahoo.co.jp
 
 ## <li>プロダクトの主な使用者 <text class="unified-writing-word">誰のどんな課題を解決するのか？</text></li>
+
+<text class="unified-writing-word">誰のどんな課題を解決するのか？</text>
 
 本アプリケーションの主な使用者は、企業や組織の公開メールアドレスに対して何らかのアクションを取る業務を担当している方々です。
 ## <li>誰のどんな課題を解決するのか？</li>
